@@ -1,4 +1,5 @@
 
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -6,6 +7,9 @@
     <title>نظام تحليل نتائج الطلاب - النسخة المحسنة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -528,14 +532,88 @@
             border-right: 4px solid var(--primary);
         }
         
+        .alert-error {
+            background: rgba(198, 40, 40, 0.1);
+            color: var(--bad);
+            border-right: 4px solid var(--bad);
+        }
+        
         .alert-icon {
             margin-left: 0.75rem;
             font-size: 1.2rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 
 <body>
+    <!-- Modal للتحميل -->
+    <div id="loadingModal" class="modal">
+        <div class="modal-content" style="text-align: center; padding: 3rem;">
+            <div class="loading"></div>
+            <h3 style="margin-top: 1rem;">جارٍ التصدير، يرجى الانتظار...</h3>
+            <p id="exportProgress"></p>
+        </div>
+    </div>
+
     <header>
         <h1><i class="fas fa-chart-line header-icon"></i> نظام تحليل نتائج الطلاب</h1>
         <p>منصة متكاملة للتحليل الإحصائي والتربوي لنتائج الطلاب مع رسوم بيانية تفاعلية ودعم متقدم لاتخاذ القرارات</p>
@@ -577,6 +655,7 @@
                 <textarea id="names" rows="6" placeholder="أحمد محمد
 فاطمة علي
 خالد سعيد
+سارة عبدالله
 ..."></textarea>
                 
                 <div class="alert alert-warning">
@@ -813,6 +892,9 @@
                     </button>
                     <button class="btn export-btn" onclick="exportToExcel()">
                         <i class="fas fa-file-excel"></i> تصدير إلى Excel
+                    </button>
+                    <button class="btn export-btn" onclick="exportToCSV()">
+                        <i class="fas fa-file-csv"></i> تصدير إلى CSV
                     </button>
                     <button class="btn export-btn" onclick="exportCharts()">
                         <i class="fas fa-image"></i> تصدير الرسوم البيانية
@@ -1303,33 +1385,434 @@
             document.getElementById('reportExcellentCount').textContent = excellentCount;
         }
         
-        // وظائف التصدير
+        // وظائف التصدير الحقيقية
         function exportToPDF() {
-            showAlert('جارٍ تحضير ملف PDF للتحميل...', 'info');
-            // في تطبيق حقيقي، هنا سيتم استخدام مكتبة مثل jsPDF
+            if (students.length === 0) {
+                showAlert('لا توجد بيانات لتصديرها. الرجاء إضافة بيانات أولاً.', 'error');
+                return;
+            }
+            
+            showLoadingModal('جارٍ إنشاء ملف PDF...');
+            
             setTimeout(() => {
-                showAlert('تم إنشاء ملف PDF بنجاح. سيبدأ التحميل تلقائياً', 'success');
-            }, 1500);
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4'
+                    });
+                    
+                    // إعداد الخط العربي (نستخدم خط افتراضي مع دعم Unicode)
+                    doc.setFont("helvetica", "normal");
+                    
+                    // العنوان
+                    doc.setFontSize(20);
+                    doc.text('تقرير تحليل نتائج الطلاب', 105, 15, { align: 'center' });
+                    
+                    // التاريخ
+                    doc.setFontSize(12);
+                    doc.text(`تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}`, 105, 25, { align: 'center' });
+                    
+                    // إحصائيات عامة
+                    doc.setFontSize(14);
+                    doc.text('الإحصائيات العامة', 105, 35, { align: 'center' });
+                    
+                    const totals = students.map(s => s.tasks + s.att + s.final);
+                    const percentages = totals.map(t => Math.round((t / 160) * 100));
+                    const avgValue = totals.reduce((a, b) => a + b, 0) / totals.length;
+                    const passRate = (percentages.filter(p => p >= 60).length / percentages.length * 100).toFixed(1);
+                    const excellentCount = percentages.filter(p => p >= 90).length;
+                    const weakCount = percentages.filter(p => p < 60).length;
+                    
+                    doc.setFontSize(12);
+                    doc.text(`إجمالي عدد الطلاب: ${students.length}`, 20, 45);
+                    doc.text(`المتوسط العام: ${avgValue.toFixed(1)}`, 20, 52);
+                    doc.text(`نسبة النجاح: ${passRate}%`, 20, 59);
+                    doc.text(`عدد المتفوقين: ${excellentCount}`, 20, 66);
+                    doc.text(`عدد المتعثرين: ${weakCount}`, 20, 73);
+                    
+                    // جدول الطلاب
+                    doc.setFontSize(14);
+                    doc.text('تفاصيل درجات الطلاب', 105, 85, { align: 'center' });
+                    
+                    // إعداد بيانات الجدول
+                    const tableData = students.map((student, index) => {
+                        const cont = student.tasks + student.att;
+                        const total = cont + student.final;
+                        const percentage = Math.round((total / 160) * 100);
+                        const [levelText] = getLevel(percentage);
+                        
+                        return [
+                            index + 1,
+                            student.name,
+                            student.tasks,
+                            student.att,
+                            cont,
+                            student.final,
+                            total,
+                            `${percentage}%`,
+                            levelText
+                        ];
+                    });
+                    
+                    // إضافة الجدول
+                    doc.autoTable({
+                        startY: 90,
+                        head: [['#', 'الطالب', 'المهام', 'الحضور', 'المستمر', 'النهائي', 'المجموع', 'النسبة', 'المستوى']],
+                        body: tableData,
+                        theme: 'grid',
+                        styles: { font: 'helvetica', fontSize: 10, textAlign: 'center' },
+                        headStyles: { fillColor: [11, 60, 93], textColor: 255, fontStyle: 'bold' },
+                        alternateRowStyles: { fillColor: [240, 240, 240] },
+                        margin: { right: 20, left: 20 }
+                    });
+                    
+                    // التوصيات
+                    const finalY = doc.lastAutoTable.finalY + 10;
+                    doc.setFontSize(14);
+                    doc.text('التوصيات', 105, finalY, { align: 'center' });
+                    
+                    doc.setFontSize(11);
+                    let yPos = finalY + 10;
+                    doc.text('1. توفير جلسات علاجية للطلاب المتعثرين', 20, yPos);
+                    yPos += 7;
+                    doc.text('2. تطوير أنشطة إثرائية للطلاب المتفوقين', 20, yPos);
+                    yPos += 7;
+                    doc.text('3. مراجعة استراتيجيات التدريس بناءً على نتائج التحليل', 20, yPos);
+                    
+                    // حفظ الملف
+                    doc.save(`تقرير_نتائج_الطلاب_${new Date().toISOString().split('T')[0]}.pdf`);
+                    
+                    hideLoadingModal();
+                    showAlert('تم تصدير البيانات إلى ملف PDF بنجاح', 'success');
+                } catch (error) {
+                    hideLoadingModal();
+                    showAlert('حدث خطأ أثناء إنشاء ملف PDF: ' + error.message, 'error');
+                    console.error('PDF Export Error:', error);
+                }
+            }, 1000);
         }
         
         function exportToExcel() {
-            showAlert('جارٍ تحضير ملف Excel للتحميل...', 'info');
-            // في تطبيق حقيقي، هنا سيتم استخدام مكتبة مثل SheetJS
+            if (students.length === 0) {
+                showAlert('لا توجد بيانات لتصديرها. الرجاء إضافة بيانات أولاً.', 'error');
+                return;
+            }
+            
+            showLoadingModal('جارٍ إنشاء ملف Excel...');
+            
             setTimeout(() => {
-                showAlert('تم إنشاء ملف Excel بنجاح. سيبدأ التحميل تلقائياً', 'success');
-            }, 1500);
+                try {
+                    // إعداد بيانات الورقة
+                    const data = students.map((student, index) => {
+                        const cont = student.tasks + student.att;
+                        const total = cont + student.final;
+                        const percentage = Math.round((total / 160) * 100);
+                        const [levelText] = getLevel(percentage);
+                        
+                        return {
+                            'الرقم': index + 1,
+                            'اسم الطالب': student.name,
+                            'المهام الأدائية': student.tasks,
+                            'الحضور والمشاركة': student.att,
+                            'المستمر': cont,
+                            'الاختبار النهائي': student.final,
+                            'المجموع الكلي': total,
+                            'النسبة المئوية': `${percentage}%`,
+                            'المستوى': levelText
+                        };
+                    });
+                    
+                    // إضافة إحصائيات عامة
+                    const totals = students.map(s => s.tasks + s.att + s.final);
+                    const percentages = totals.map(t => Math.round((t / 160) * 100));
+                    const avgValue = totals.reduce((a, b) => a + b, 0) / totals.length;
+                    const passRate = (percentages.filter(p => p >= 60).length / percentages.length * 100).toFixed(1);
+                    const excellentCount = percentages.filter(p => p >= 90).length;
+                    const weakCount = percentages.filter(p => p < 60).length;
+                    
+                    const statsData = [
+                        {},
+                        { 'اسم الطالب': 'الإحصائيات العامة', 'المجموع الكلي': '' },
+                        { 'اسم الطالب': 'إجمالي عدد الطلاب', 'المجموع الكلي': students.length },
+                        { 'اسم الطالب': 'المتوسط العام', 'المجموع الكلي': avgValue.toFixed(1) },
+                        { 'اسم الطالب': 'نسبة النجاح', 'المجموع الكلي': `${passRate}%` },
+                        { 'اسم الطالب': 'عدد المتفوقين', 'المجموع الكلي': excellentCount },
+                        { 'اسم الطالب': 'عدد المتعثرين', 'المجموع الكلي': weakCount }
+                    ];
+                    
+                    // دمج البيانات
+                    const allData = [...statsData, {}, ...data];
+                    
+                    // إنشاء ورقة العمل
+                    const ws = XLSX.utils.json_to_sheet(allData, { skipHeader: true });
+                    
+                    // إضافة عنوان
+                    const title = [['تقرير تحليل نتائج الطلاب'], [`تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}`], []];
+                    XLSX.utils.sheet_add_aoa(ws, title, { origin: "A1" });
+                    
+                    // إنشاء المصنف وإضافة الورقة
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "نتائج الطلاب");
+                    
+                    // حفظ الملف
+                    XLSX.writeFile(wb, `نتائج_الطلاب_${new Date().toISOString().split('T')[0]}.xlsx`);
+                    
+                    hideLoadingModal();
+                    showAlert('تم تصدير البيانات إلى ملف Excel بنجاح', 'success');
+                } catch (error) {
+                    hideLoadingModal();
+                    showAlert('حدث خطأ أثناء إنشاء ملف Excel: ' + error.message, 'error');
+                    console.error('Excel Export Error:', error);
+                }
+            }, 1000);
+        }
+        
+        function exportToCSV() {
+            if (students.length === 0) {
+                showAlert('لا توجد بيانات لتصديرها. الرجاء إضافة بيانات أولاً.', 'error');
+                return;
+            }
+            
+            showLoadingModal('جارٍ إنشاء ملف CSV...');
+            
+            setTimeout(() => {
+                try {
+                    // إعداد رأس CSV
+                    let csvContent = "الرقم,اسم الطالب,المهام الأدائية,الحضور والمشاركة,المستمر,الاختبار النهائي,المجموع الكلي,النسبة المئوية,المستوى\n";
+                    
+                    // إضافة بيانات الطلاب
+                    students.forEach((student, index) => {
+                        const cont = student.tasks + student.att;
+                        const total = cont + student.final;
+                        const percentage = Math.round((total / 160) * 100);
+                        const [levelText] = getLevel(percentage);
+                        
+                        csvContent += `${index + 1},${student.name},${student.tasks},${student.att},${cont},${student.final},${total},${percentage}%,${levelText}\n`;
+                    });
+                    
+                    // إضافة إحصائيات
+                    const totals = students.map(s => s.tasks + s.att + s.final);
+                    const percentages = totals.map(t => Math.round((t / 160) * 100));
+                    const avgValue = totals.reduce((a, b) => a + b, 0) / totals.length;
+                    const passRate = (percentages.filter(p => p >= 60).length / percentages.length * 100).toFixed(1);
+                    const excellentCount = percentages.filter(p => p >= 90).length;
+                    const weakCount = percentages.filter(p => p < 60).length;
+                    
+                    csvContent += `\n\nالإحصائيات العامة\n`;
+                    csvContent += `إجمالي عدد الطلاب,${students.length}\n`;
+                    csvContent += `المتوسط العام,${avgValue.toFixed(1)}\n`;
+                    csvContent += `نسبة النجاح,${passRate}%\n`;
+                    csvContent += `عدد المتفوقين,${excellentCount}\n`;
+                    csvContent += `عدد المتعثرين,${weakCount}\n`;
+                    
+                    // إنشاء رابط تحميل
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement("a");
+                    const url = URL.createObjectURL(blob);
+                    
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", `نتائج_الطلاب_${new Date().toISOString().split('T')[0]}.csv`);
+                    link.style.visibility = 'hidden';
+                    
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    hideLoadingModal();
+                    showAlert('تم تصدير البيانات إلى ملف CSV بنجاح', 'success');
+                } catch (error) {
+                    hideLoadingModal();
+                    showAlert('حدث خطأ أثناء إنشاء ملف CSV: ' + error.message, 'error');
+                    console.error('CSV Export Error:', error);
+                }
+            }, 500);
         }
         
         function exportCharts() {
-            showAlert('جارٍ حفظ الرسوم البيانية كصور...', 'info');
-            // في تطبيق حقيقي، هنا سيتم تحويل الرسوم البيانية إلى صور
+            if (students.length === 0) {
+                showAlert('لا توجد رسوم بيانية لتصديرها. الرجاء إضافة بيانات أولاً.', 'error');
+                return;
+            }
+            
+            showLoadingModal('جارٍ حفظ الرسوم البيانية كصور...');
+            
             setTimeout(() => {
-                showAlert('تم حفظ الرسوم البيانية كصور بنجاح', 'success');
+                try {
+                    // تحويل كل رسم بياني إلى صورة
+                    const charts = ['barChart', 'pieChart', 'lineChart'];
+                    let savedCount = 0;
+                    
+                    charts.forEach((chartId, index) => {
+                        const chartCanvas = document.getElementById(chartId);
+                        if (chartCanvas) {
+                            const image = chartCanvas.toDataURL('image/png');
+                            const link = document.createElement('a');
+                            link.href = image;
+                            link.download = `رسم_بياني_${chartId}_${new Date().toISOString().split('T')[0]}.png`;
+                            link.click();
+                            savedCount++;
+                        }
+                    });
+                    
+                    hideLoadingModal();
+                    
+                    if (savedCount > 0) {
+                        showAlert(`تم حفظ ${savedCount} رسم بياني كصور بنجاح`, 'success');
+                    } else {
+                        showAlert('لم يتم العثور على رسوم بيانية لحفظها', 'warning');
+                    }
+                } catch (error) {
+                    hideLoadingModal();
+                    showAlert('حدث خطأ أثناء حفظ الرسوم البيانية: ' + error.message, 'error');
+                    console.error('Charts Export Error:', error);
+                }
             }, 1500);
         }
         
         function printReport() {
-            window.print();
+            if (students.length === 0) {
+                showAlert('لا توجد بيانات للطباعة. الرجاء إضافة بيانات أولاً.', 'error');
+                return;
+            }
+            
+            // إنشاء نافذة طباعة
+            const printWindow = window.open('', '_blank');
+            
+            const totals = students.map(s => s.tasks + s.att + s.final);
+            const percentages = totals.map(t => Math.round((t / 160) * 100));
+            const avgValue = totals.reduce((a, b) => a + b, 0) / totals.length;
+            const passRate = (percentages.filter(p => p >= 60).length / percentages.length * 100).toFixed(1);
+            const excellentCount = percentages.filter(p => p >= 90).length;
+            const weakCount = percentages.filter(p => p < 60).length;
+            
+            // إنشاء محتوى الطباعة
+            let printContent = `
+                <!DOCTYPE html>
+                <html lang="ar" dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>تقرير نتائج الطلاب</title>
+                    <style>
+                        body { font-family: 'Cairo', Arial, sans-serif; line-height: 1.6; color: #333; margin: 20px; }
+                        h1, h2, h3 { color: #0b3c5d; }
+                        .header { text-align: center; border-bottom: 3px solid #0b3c5d; padding-bottom: 20px; margin-bottom: 30px; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+                        th { background-color: #0b3c5d; color: white; }
+                        tr:nth-child(even) { background-color: #f9f9f9; }
+                        .stats { background-color: #f0f8ff; padding: 20px; border-radius: 10px; margin: 20px 0; }
+                        .recommendations { background-color: #fff8e1; padding: 20px; border-radius: 10px; margin: 20px 0; }
+                        @media print {
+                            body { margin: 0; padding: 10px; }
+                            .no-print { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>تقرير تحليل نتائج الطلاب</h1>
+                        <p>تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}</p>
+                        <p>نظام تحليل نتائج الطلاب - النسخة المحسنة</p>
+                    </div>
+                    
+                    <div class="stats">
+                        <h2>الإحصائيات العامة</h2>
+                        <p><strong>إجمالي عدد الطلاب:</strong> ${students.length}</p>
+                        <p><strong>المتوسط العام:</strong> ${avgValue.toFixed(1)} من 160</p>
+                        <p><strong>نسبة النجاح:</strong> ${passRate}%</p>
+                        <p><strong>عدد المتفوقين:</strong> ${excellentCount} طالب</p>
+                        <p><strong>عدد المتعثرين:</strong> ${weakCount} طالب</p>
+                    </div>
+                    
+                    <h2>تفاصيل درجات الطلاب</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>اسم الطالب</th>
+                                <th>المهام الأدائية</th>
+                                <th>الحضور والمشاركة</th>
+                                <th>المستمر</th>
+                                <th>الاختبار النهائي</th>
+                                <th>المجموع الكلي</th>
+                                <th>النسبة المئوية</th>
+                                <th>المستوى</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // إضافة بيانات الطلاب
+            students.forEach((student, index) => {
+                const cont = student.tasks + student.att;
+                const total = cont + student.final;
+                const percentage = Math.round((total / 160) * 100);
+                const [levelText] = getLevel(percentage);
+                
+                printContent += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${student.name}</td>
+                        <td>${student.tasks}</td>
+                        <td>${student.att}</td>
+                        <td>${cont}</td>
+                        <td>${student.final}</td>
+                        <td><strong>${total}</strong></td>
+                        <td>${percentage}%</td>
+                        <td>${levelText}</td>
+                    </tr>
+                `;
+            });
+            
+            printContent += `
+                        </tbody>
+                    </table>
+                    
+                    <div class="recommendations">
+                        <h2>التوصيات</h2>
+                        <ol>
+                            <li>توفير جلسات علاجية للطلاب المتعثرين (${weakCount} طالب)</li>
+                            <li>تطوير أنشطة إثرائية للطلاب المتفوقين (${excellentCount} طالب)</li>
+                            <li>مراجعة استراتيجيات التدريس بناءً على نتائج التحليل</li>
+                            <li>توزيع الطلاب على مجموعات متجانسة حسب مستوياتهم</li>
+                            <li>تطوير خطط دعم فردية للطلاب المتعثرين</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="no-print" style="text-align: center; margin-top: 30px;">
+                        <button onclick="window.print()" style="padding: 10px 20px; background-color: #0b3c5d; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            طباعة التقرير
+                        </button>
+                        <button onclick="window.close()" style="padding: 10px 20px; background-color: #c62828; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">
+                            إغلاق النافذة
+                        </button>
+                    </div>
+                    
+                    <footer style="margin-top: 50px; text-align: center; color: #666; font-size: 12px;">
+                        <p>تم إنشاء هذا التقرير بواسطة نظام تحليل نتائج الطلاب - النسخة المحسنة</p>
+                        <p>© ${new Date().getFullYear()} - جميع الحقوق محفوظة</p>
+                    </footer>
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            
+            showAlert('تم فتح نافذة الطباعة. يرجى استخدام قائمة الطباعة في المتصفح.', 'info');
+        }
+        
+        // وظائف مساعدة للواجهة
+        function showLoadingModal(message = 'جارٍ التحميل...') {
+            document.getElementById('exportProgress').textContent = message;
+            document.getElementById('loadingModal').style.display = 'block';
+        }
+        
+        function hideLoadingModal() {
+            document.getElementById('loadingModal').style.display = 'none';
         }
         
         // عرض رسائل التنبيه
@@ -1342,6 +1825,7 @@
             let icon = 'info-circle';
             if (type === 'success') icon = 'check-circle';
             if (type === 'warning') icon = 'exclamation-triangle';
+            if (type === 'error') icon = 'exclamation-circle';
             
             alertDiv.innerHTML = `
                 <i class="fas fa-${icon} alert-icon"></i>
@@ -1354,7 +1838,9 @@
             
             // إزالة التنبيه بعد 5 ثوان
             setTimeout(() => {
-                alertDiv.remove();
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
             }, 5000);
         }
         
