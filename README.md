@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -601,6 +600,35 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        .excel-tips {
+            background: #e8f4f8;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-right: 4px solid #2a9d8f;
+        }
+        
+        .excel-tips h4 {
+            color: #0b3c5d;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .excel-tips h4 i {
+            margin-left: 0.5rem;
+            color: #2a9d8f;
+        }
+        
+        .excel-tips ul {
+            padding-right: 1.5rem;
+        }
+        
+        .excel-tips li {
+            margin-bottom: 0.75rem;
+            line-height: 1.7;
+        }
     </style>
 </head>
 
@@ -902,6 +930,16 @@
                     <button class="btn export-btn" onclick="printReport()">
                         <i class="fas fa-print"></i> طباعة التقرير
                     </button>
+                </div>
+                
+                <div class="excel-tips">
+                    <h4><i class="fas fa-lightbulb"></i> نصائح لفتح ملفات Excel العربية بشكل صحيح</h4>
+                    <ul>
+                        <li>عند فتح ملف CSV: اختر ترميز UTF-8 وحدد اتجاه النص من اليمين لليسار</li>
+                        <li>في Excel: انتقل إلى Data → Get Data → From Text/CSV → اختر ملف CSV → اختر ترميز 65001: Unicode (UTF-8)</li>
+                        <li>لضبط اتجاه النص: اختر الخلايا → Format Cells → Alignment → اختر Right-to-left</li>
+                        <li>للحصول على أفضل نتيجة: استخدم Microsoft Excel 2016 أو أحدث</li>
+                    </ul>
                 </div>
                 
                 <div class="interpretation" style="margin-top: 2rem;">
@@ -1385,7 +1423,7 @@
             document.getElementById('reportExcellentCount').textContent = excellentCount;
         }
         
-        // وظائف التصدير الحقيقية
+        // وظائف التصدير المحسنة للغة العربية
         function exportToPDF() {
             if (students.length === 0) {
                 showAlert('لا توجد بيانات لتصديرها. الرجاء إضافة بيانات أولاً.', 'error');
@@ -1402,9 +1440,6 @@
                         unit: 'mm',
                         format: 'a4'
                     });
-                    
-                    // إعداد الخط العربي (نستخدم خط افتراضي مع دعم Unicode)
-                    doc.setFont("helvetica", "normal");
                     
                     // العنوان
                     doc.setFontSize(20);
@@ -1459,13 +1494,28 @@
                     // إضافة الجدول
                     doc.autoTable({
                         startY: 90,
-                        head: [['#', 'الطالب', 'المهام', 'الحضور', 'المستمر', 'النهائي', 'المجموع', 'النسبة', 'المستوى']],
+                        head: [['#', 'اسم الطالب', 'المهام', 'الحضور', 'المستمر', 'النهائي', 'المجموع', 'النسبة', 'المستوى']],
                         body: tableData,
                         theme: 'grid',
-                        styles: { font: 'helvetica', fontSize: 10, textAlign: 'center' },
-                        headStyles: { fillColor: [11, 60, 93], textColor: 255, fontStyle: 'bold' },
+                        styles: { 
+                            font: 'helvetica', 
+                            fontSize: 10, 
+                            textAlign: 'center',
+                            cellPadding: 3
+                        },
+                        headStyles: { 
+                            fillColor: [11, 60, 93], 
+                            textColor: 255, 
+                            fontStyle: 'bold',
+                            halign: 'center'
+                        },
                         alternateRowStyles: { fillColor: [240, 240, 240] },
-                        margin: { right: 20, left: 20 }
+                        margin: { right: 20, left: 20 },
+                        columnStyles: {
+                            0: { cellWidth: 10 },
+                            1: { cellWidth: 30 },
+                            8: { cellWidth: 20 }
+                        }
                     });
                     
                     // التوصيات
@@ -1504,27 +1554,7 @@
             
             setTimeout(() => {
                 try {
-                    // إعداد بيانات الورقة
-                    const data = students.map((student, index) => {
-                        const cont = student.tasks + student.att;
-                        const total = cont + student.final;
-                        const percentage = Math.round((total / 160) * 100);
-                        const [levelText] = getLevel(percentage);
-                        
-                        return {
-                            'الرقم': index + 1,
-                            'اسم الطالب': student.name,
-                            'المهام الأدائية': student.tasks,
-                            'الحضور والمشاركة': student.att,
-                            'المستمر': cont,
-                            'الاختبار النهائي': student.final,
-                            'المجموع الكلي': total,
-                            'النسبة المئوية': `${percentage}%`,
-                            'المستوى': levelText
-                        };
-                    });
-                    
-                    // إضافة إحصائيات عامة
+                    // حساب الإحصائيات
                     const totals = students.map(s => s.tasks + s.att + s.final);
                     const percentages = totals.map(t => Math.round((t / 160) * 100));
                     const avgValue = totals.reduce((a, b) => a + b, 0) / totals.length;
@@ -1532,35 +1562,101 @@
                     const excellentCount = percentages.filter(p => p >= 90).length;
                     const weakCount = percentages.filter(p => p < 60).length;
                     
-                    const statsData = [
-                        {},
-                        { 'اسم الطالب': 'الإحصائيات العامة', 'المجموع الكلي': '' },
-                        { 'اسم الطالب': 'إجمالي عدد الطلاب', 'المجموع الكلي': students.length },
-                        { 'اسم الطالب': 'المتوسط العام', 'المجموع الكلي': avgValue.toFixed(1) },
-                        { 'اسم الطالب': 'نسبة النجاح', 'المجموع الكلي': `${passRate}%` },
-                        { 'اسم الطالب': 'عدد المتفوقين', 'المجموع الكلي': excellentCount },
-                        { 'اسم الطالب': 'عدد المتعثرين', 'المجموع الكلي': weakCount }
+                    // إنشاء مصنف جديد
+                    const wb = XLSX.utils.book_new();
+                    
+                    // إنشاء ورقة للبيانات الرئيسية
+                    const mainData = [];
+                    
+                    // إضافة العنوان
+                    mainData.push(['تقرير تحليل نتائج الطلاب']);
+                    mainData.push([`تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}`]);
+                    mainData.push([]);
+                    
+                    // إضافة رأس الجدول
+                    mainData.push([
+                        'الرقم',
+                        'اسم الطالب',
+                        'المهام الأدائية (40)',
+                        'الحضور والمشاركة (20)',
+                        'المستمر (60)',
+                        'الاختبار النهائي (40)',
+                        'المجموع الكلي (160)',
+                        'النسبة المئوية',
+                        'المستوى'
+                    ]);
+                    
+                    // إضافة بيانات الطلاب
+                    students.forEach((student, index) => {
+                        const cont = student.tasks + student.att;
+                        const total = cont + student.final;
+                        const percentage = Math.round((total / 160) * 100);
+                        const [levelText] = getLevel(percentage);
+                        
+                        mainData.push([
+                            index + 1,
+                            student.name,
+                            student.tasks,
+                            student.att,
+                            cont,
+                            student.final,
+                            total,
+                            `${percentage}%`,
+                            levelText
+                        ]);
+                    });
+                    
+                    // إنشاء ورقة البيانات الرئيسية
+                    const ws_main = XLSX.utils.aoa_to_sheet(mainData);
+                    
+                    // تنسيق عرض الأعمدة
+                    const colWidths = [
+                        { wch: 8 },  // الرقم
+                        { wch: 25 }, // اسم الطالب
+                        { wch: 15 }, // المهام
+                        { wch: 15 }, // الحضور
+                        { wch: 15 }, // المستمر
+                        { wch: 15 }, // النهائي
+                        { wch: 15 }, // المجموع
+                        { wch: 15 }, // النسبة
+                        { wch: 15 }  // المستوى
                     ];
                     
-                    // دمج البيانات
-                    const allData = [...statsData, {}, ...data];
+                    ws_main['!cols'] = colWidths;
                     
-                    // إنشاء ورقة العمل
-                    const ws = XLSX.utils.json_to_sheet(allData, { skipHeader: true });
+                    // إضافة المصنف
+                    XLSX.utils.book_append_sheet(wb, ws_main, "نتائج الطلاب");
                     
-                    // إضافة عنوان
-                    const title = [['تقرير تحليل نتائج الطلاب'], [`تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}`], []];
-                    XLSX.utils.sheet_add_aoa(ws, title, { origin: "A1" });
+                    // إنشاء ورقة للإحصائيات
+                    const statsData = [
+                        ['الإحصائيات العامة'],
+                        [],
+                        ['المؤشر', 'القيمة'],
+                        ['إجمالي عدد الطلاب', students.length],
+                        ['المتوسط العام', avgValue.toFixed(1)],
+                        ['نسبة النجاح', `${passRate}%`],
+                        ['عدد المتفوقين', excellentCount],
+                        ['عدد المتعثرين', weakCount],
+                        ['أعلى درجة', Math.max(...totals)],
+                        ['أقل درجة', Math.min(...totals)],
+                        [],
+                        ['التوصيات'],
+                        [],
+                        ['1. توفير جلسات علاجية للطلاب المتعثرين'],
+                        ['2. تطوير أنشطة إثرائية للطلاب المتفوقين'],
+                        ['3. مراجعة استراتيجيات التدريس بناءً على نتائج التحليل']
+                    ];
                     
-                    // إنشاء المصنف وإضافة الورقة
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "نتائج الطلاب");
+                    const ws_stats = XLSX.utils.aoa_to_sheet(statsData);
+                    ws_stats['!cols'] = [{ wch: 40 }, { wch: 20 }];
+                    XLSX.utils.book_append_sheet(wb, ws_stats, "الإحصائيات");
                     
-                    // حفظ الملف
+                    // حفظ الملف بترميز UTF-8
                     XLSX.writeFile(wb, `نتائج_الطلاب_${new Date().toISOString().split('T')[0]}.xlsx`);
                     
                     hideLoadingModal();
                     showAlert('تم تصدير البيانات إلى ملف Excel بنجاح', 'success');
+                    showAlert('ملاحظة: للحصول على أفضل عرض للغة العربية، افتح الملف باستخدام Microsoft Excel 2016 أو أحدث', 'info');
                 } catch (error) {
                     hideLoadingModal();
                     showAlert('حدث خطأ أثناء إنشاء ملف Excel: ' + error.message, 'error');
@@ -1579,8 +1675,11 @@
             
             setTimeout(() => {
                 try {
+                    // إعداد بيانات CSV مع BOM لضمان عرض العربية بشكل صحيح
+                    const BOM = "\uFEFF";
+                    
                     // إعداد رأس CSV
-                    let csvContent = "الرقم,اسم الطالب,المهام الأدائية,الحضور والمشاركة,المستمر,الاختبار النهائي,المجموع الكلي,النسبة المئوية,المستوى\n";
+                    let csvContent = BOM + "الرقم,اسم الطالب,المهام الأدائية (40),الحضور والمشاركة (20),المستمر (60),الاختبار النهائي (40),المجموع الكلي (160),النسبة المئوية,المستوى\r\n";
                     
                     // إضافة بيانات الطلاب
                     students.forEach((student, index) => {
@@ -1589,7 +1688,8 @@
                         const percentage = Math.round((total / 160) * 100);
                         const [levelText] = getLevel(percentage);
                         
-                        csvContent += `${index + 1},${student.name},${student.tasks},${student.att},${cont},${student.final},${total},${percentage}%,${levelText}\n`;
+                        // وضع النصوص بين علامتي اقتباس لتجنب مشاكل الفواصل
+                        csvContent += `${index + 1},"${student.name}",${student.tasks},${student.att},${cont},${student.final},${total},${percentage}%,"${levelText}"\r\n`;
                     });
                     
                     // إضافة إحصائيات
@@ -1600,12 +1700,12 @@
                     const excellentCount = percentages.filter(p => p >= 90).length;
                     const weakCount = percentages.filter(p => p < 60).length;
                     
-                    csvContent += `\n\nالإحصائيات العامة\n`;
-                    csvContent += `إجمالي عدد الطلاب,${students.length}\n`;
-                    csvContent += `المتوسط العام,${avgValue.toFixed(1)}\n`;
-                    csvContent += `نسبة النجاح,${passRate}%\n`;
-                    csvContent += `عدد المتفوقين,${excellentCount}\n`;
-                    csvContent += `عدد المتعثرين,${weakCount}\n`;
+                    csvContent += `\r\n\r\nالإحصائيات العامة\r\n`;
+                    csvContent += `"إجمالي عدد الطلاب",${students.length}\r\n`;
+                    csvContent += `"المتوسط العام",${avgValue.toFixed(1)}\r\n`;
+                    csvContent += `"نسبة النجاح",${passRate}%\r\n`;
+                    csvContent += `"عدد المتفوقين",${excellentCount}\r\n`;
+                    csvContent += `"عدد المتعثرين",${weakCount}\r\n`;
                     
                     // إنشاء رابط تحميل
                     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -1622,6 +1722,7 @@
                     
                     hideLoadingModal();
                     showAlert('تم تصدير البيانات إلى ملف CSV بنجاح', 'success');
+                    showAlert('ملاحظة: لفتح الملف بشكل صحيح في Excel، اختر ترميز UTF-8 عند الاستيراد', 'info');
                 } catch (error) {
                     hideLoadingModal();
                     showAlert('حدث خطأ أثناء إنشاء ملف CSV: ' + error.message, 'error');
@@ -1641,16 +1742,21 @@
             setTimeout(() => {
                 try {
                     // تحويل كل رسم بياني إلى صورة
-                    const charts = ['barChart', 'pieChart', 'lineChart'];
+                    const charts = [
+                        { id: 'barChart', name: 'الرسم_البياني_للأعمدة' },
+                        { id: 'pieChart', name: 'الرسم_البياني_الدائري' },
+                        { id: 'lineChart', name: 'الرسم_البياني_الخطي' }
+                    ];
+                    
                     let savedCount = 0;
                     
-                    charts.forEach((chartId, index) => {
-                        const chartCanvas = document.getElementById(chartId);
+                    charts.forEach((chart) => {
+                        const chartCanvas = document.getElementById(chart.id);
                         if (chartCanvas) {
-                            const image = chartCanvas.toDataURL('image/png');
+                            const image = chartCanvas.toDataURL('image/png', 1.0);
                             const link = document.createElement('a');
                             link.href = image;
-                            link.download = `رسم_بياني_${chartId}_${new Date().toISOString().split('T')[0]}.png`;
+                            link.download = `${chart.name}_${new Date().toISOString().split('T')[0]}.png`;
                             link.click();
                             savedCount++;
                         }
@@ -1659,7 +1765,7 @@
                     hideLoadingModal();
                     
                     if (savedCount > 0) {
-                        showAlert(`تم حفظ ${savedCount} رسم بياني كصور بنجاح`, 'success');
+                        showAlert(`تم حفظ ${savedCount} رسم بياني كصور PNG بنجاح`, 'success');
                     } else {
                         showAlert('لم يتم العثور على رسوم بيانية لحفظها', 'warning');
                     }
@@ -1696,25 +1802,76 @@
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title>تقرير نتائج الطلاب</title>
                     <style>
-                        body { font-family: 'Cairo', Arial, sans-serif; line-height: 1.6; color: #333; margin: 20px; }
+                        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
+                        body { 
+                            font-family: 'Cairo', Arial, sans-serif; 
+                            line-height: 1.6; 
+                            color: #333; 
+                            margin: 20px;
+                            direction: rtl;
+                        }
                         h1, h2, h3 { color: #0b3c5d; }
-                        .header { text-align: center; border-bottom: 3px solid #0b3c5d; padding-bottom: 20px; margin-bottom: 30px; }
-                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
-                        th { background-color: #0b3c5d; color: white; }
+                        .header { 
+                            text-align: center; 
+                            border-bottom: 3px solid #0b3c5d; 
+                            padding-bottom: 20px; 
+                            margin-bottom: 30px; 
+                        }
+                        table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            margin: 20px 0;
+                            font-size: 14px;
+                        }
+                        th, td { 
+                            border: 1px solid #ddd; 
+                            padding: 10px; 
+                            text-align: center;
+                            font-family: 'Cairo', sans-serif;
+                        }
+                        th { 
+                            background-color: #0b3c5d; 
+                            color: white; 
+                            font-weight: bold;
+                        }
                         tr:nth-child(even) { background-color: #f9f9f9; }
-                        .stats { background-color: #f0f8ff; padding: 20px; border-radius: 10px; margin: 20px 0; }
-                        .recommendations { background-color: #fff8e1; padding: 20px; border-radius: 10px; margin: 20px 0; }
+                        .stats { 
+                            background-color: #f0f8ff; 
+                            padding: 20px; 
+                            border-radius: 10px; 
+                            margin: 20px 0;
+                            border-right: 4px solid #0b3c5d;
+                        }
+                        .recommendations { 
+                            background-color: #fff8e1; 
+                            padding: 20px; 
+                            border-radius: 10px; 
+                            margin: 20px 0;
+                            border-right: 4px solid #f9a825;
+                        }
+                        .print-date {
+                            text-align: left;
+                            font-size: 12px;
+                            color: #666;
+                            margin-bottom: 20px;
+                        }
                         @media print {
                             body { margin: 0; padding: 10px; }
                             .no-print { display: none; }
+                            table { page-break-inside: auto; }
+                            tr { page-break-inside: avoid; page-break-after: auto; }
+                            thead { display: table-header-group; }
+                            tfoot { display: table-footer-group; }
                         }
                     </style>
                 </head>
                 <body>
+                    <div class="print-date">
+                        تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}
+                    </div>
+                    
                     <div class="header">
                         <h1>تقرير تحليل نتائج الطلاب</h1>
-                        <p>تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}</p>
                         <p>نظام تحليل نتائج الطلاب - النسخة المحسنة</p>
                     </div>
                     
@@ -1752,10 +1909,17 @@
                 const percentage = Math.round((total / 160) * 100);
                 const [levelText] = getLevel(percentage);
                 
+                // تحديد لون الخلفية حسب المستوى
+                let rowColor = '';
+                if (percentage >= 90) rowColor = 'background-color: #e8f5e8;';
+                else if (percentage >= 75) rowColor = 'background-color: #f0f8ff;';
+                else if (percentage >= 60) rowColor = 'background-color: #fff8e1;';
+                else rowColor = 'background-color: #ffebee;';
+                
                 printContent += `
-                    <tr>
+                    <tr style="${rowColor}">
                         <td>${index + 1}</td>
-                        <td>${student.name}</td>
+                        <td><strong>${student.name}</strong></td>
                         <td>${student.tasks}</td>
                         <td>${student.att}</td>
                         <td>${cont}</td>
@@ -1783,15 +1947,15 @@
                     </div>
                     
                     <div class="no-print" style="text-align: center; margin-top: 30px;">
-                        <button onclick="window.print()" style="padding: 10px 20px; background-color: #0b3c5d; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <button onclick="window.print()" style="padding: 10px 20px; background-color: #0b3c5d; color: white; border: none; border-radius: 5px; cursor: pointer; font-family: 'Cairo', sans-serif;">
                             طباعة التقرير
                         </button>
-                        <button onclick="window.close()" style="padding: 10px 20px; background-color: #c62828; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">
+                        <button onclick="window.close()" style="padding: 10px 20px; background-color: #c62828; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px; font-family: 'Cairo', sans-serif;">
                             إغلاق النافذة
                         </button>
                     </div>
                     
-                    <footer style="margin-top: 50px; text-align: center; color: #666; font-size: 12px;">
+                    <footer style="margin-top: 50px; text-align: center; color: #666; font-size: 12px; border-top: 1px solid #ddd; padding-top: 20px;">
                         <p>تم إنشاء هذا التقرير بواسطة نظام تحليل نتائج الطلاب - النسخة المحسنة</p>
                         <p>© ${new Date().getFullYear()} - جميع الحقوق محفوظة</p>
                     </footer>
