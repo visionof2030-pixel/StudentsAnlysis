@@ -3,1465 +3,1304 @@
 <head>
 <meta charset="UTF-8">
 <title>تقرير تحليل نتائج اختبار مادة الرياضيات</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<!-- المكتبات الخارجية -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
-@page {
-    size: A4;
-    margin: 0;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: 'Tahoma', 'Arial', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-    margin: 0;
-    padding: 12px;
-    min-height: 100vh;
-}
-
-.actions-container {
-    text-align: center;
-    margin-bottom: 20px;
-    padding: 15px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.actions-title {
-    font-size: 18px;
-    font-weight: bold;
-    color: #1a5c9e;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #25d366;
-}
-
-.input-group {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 15px;
-}
-
-.input-field {
-    flex: 1;
-    min-width: 250px;
-    max-width: 400px;
-    position: relative;
-}
-
-.input-field input {
-    width: 100%;
-    padding: 12px 40px 12px 15px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    background: #f8f9fa;
-}
-
-.input-field input:focus {
-    outline: none;
-    border-color: #25d366;
-    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
-    background: white;
-}
-
-.buttons-group {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-}
-
-.btn {
-    background: #25d366;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    font-size: 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    margin: 4px;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-width: 200px;
-}
-
-.btn:hover {
-    background: #1da851;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
-}
-
-.btn:active {
-    transform: translateY(0);
-}
-
-.btn-secondary {
-    background: #1a5c9e;
-}
-
-.btn-secondary:hover {
-    background: #154a80;
-    box-shadow: 0 4px 12px rgba(26, 92, 158, 0.3);
-}
-
-.btn-danger {
-    background: #f44336;
-}
-
-.btn-danger:hover {
-    background: #d32f2f;
-    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
-}
-
-.btn i {
-    font-size: 16px;
-}
-
-.file-input-container {
-    position: relative;
-    display: inline-block;
-}
-
-.file-input-container input[type="file"] {
-    position: absolute;
-    left: 0;
-    top: 0;
-    opacity: 0;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-}
-
-.file-label {
-    display: inline-block;
-    padding: 12px 24px;
-    background: #2196f3;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
-
-.file-label:hover {
-    background: #1976d2;
-    transform: translateY(-2px);
-}
-
-.loading {
-    display: none;
-    text-align: center;
-    padding: 20px;
-}
-
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #25d366;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 10px;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.page {
-    background: white;
-    width: 210mm;
-    min-height: 297mm;
-    margin: 20px auto;
-    padding: 20mm;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
-    position: relative;
-}
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 3px solid #1a5c9e;
-    background: linear-gradient(to right, #f8fafc, #ffffff, #f8fafc);
-    padding: 15px;
-    border-radius: 10px;
-}
-
-.header div {
-    flex: 1;
-    text-align: center;
-    padding: 0 10px;
-}
-
-.header div:first-child {
-    text-align: right;
-}
-
-.header div:last-child {
-    text-align: left;
-}
-
-.logo {
-    font-size: 20px;
-    font-weight: bold;
-    color: #1a5c9e;
-    padding: 10px 20px;
-    border: 2px solid #1a5c9e;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #f0f7ff 0%, #e3eeff 100%);
-    box-shadow: 0 4px 8px rgba(26, 92, 158, 0.1);
-}
-
-.title {
-    text-align: center;
-    font-size: 26px;
-    font-weight: bold;
-    margin: 30px 0;
-    padding: 25px;
-    background: linear-gradient(135deg, #1a5c9e 0%, #2a6cb0 100%);
-    color: white;
-    border-radius: 15px;
-    box-shadow: 0 6px 15px rgba(26, 92, 158, 0.25);
-    position: relative;
-    overflow: hidden;
-}
-
-.title::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 5px;
-    background: linear-gradient(90deg, #25d366, #4caf50, #2196f3, #1a5c9e);
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 15px;
-    margin-bottom: 30px;
-}
-
-.info-box {
-    border: 2px solid #e1e8f0;
-    border-radius: 12px;
-    padding: 18px;
-    text-align: center;
-    font-size: 14px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-}
-
-.info-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    border-color: #1a5c9e;
-}
-
-.info-box::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #25d366, #1a5c9e);
-}
-
-.info-box span {
-    display: block;
-    font-weight: bold;
-    margin-top: 10px;
-    font-size: 18px;
-    color: #1a5c9e;
-}
-
-.analysis-section {
-    border: 2px solid #e1e8f0;
-    border-radius: 15px;
-    padding: 25px;
-    font-size: 15px;
-    margin-bottom: 30px;
-    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-    line-height: 1.8;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.analysis-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e0e0e0;
-}
-
-.section-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: #1a5c9e;
-    margin: 25px 0 20px;
-    padding-right: 15px;
-    border-right: 5px solid #25d366;
-    background: linear-gradient(to right, #f0f7ff, transparent);
-    padding: 12px 20px;
-    border-radius: 0 10px 10px 0;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.stat-box {
-    border: 2px solid #e1e8f0;
-    border-radius: 12px;
-    padding: 25px;
-    text-align: center;
-    font-size: 15px;
-    background: white;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.stat-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-}
-
-.stat-box strong {
-    display: block;
-    font-size: 32px;
-    margin-top: 12px;
-    color: #1a5c9e;
-    font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-}
-
-.stat-box.success {
-    border-color: #4caf50;
-    background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e9 100%);
-}
-
-.stat-box.warning {
-    border-color: #ff9800;
-    background: linear-gradient(135deg, #fff3e0 0%, #fff8e1 100%);
-}
-
-.stat-box.info {
-    border-color: #2196f3;
-    background: linear-gradient(135deg, #e3f2fd 0%, #e1f5fe 100%);
-}
-
-.charts-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 25px;
-    margin-bottom: 35px;
-}
-
-.chart-box {
-    border: 2px solid #e1e8f0;
-    border-radius: 15px;
-    padding: 25px;
-    background: white;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    height: 320px;
-    display: flex;
-    flex-direction: column;
-}
-
-.chart-box:hover {
-    transform: translateY(-7px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-}
-
-.chart-title {
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #1a5c9e;
-    font-size: 18px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #f0f0f0;
-}
-
-.chart-container {
-    flex: 1;
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-.chart-container canvas {
-    width: 100% !important;
-    height: 100% !important;
-}
-
-.footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    font-size: 15px;
-    margin-top: 50px;
-    padding-top: 25px;
-    border-top: 3px solid #e0e0e0;
-    background: linear-gradient(to right, #f8fafc, #ffffff, #f8fafc);
-    padding: 25px;
-    border-radius: 10px;
-}
-
-.footer div {
-    text-align: center;
-    flex: 1;
-    padding: 0 20px;
-}
-
-.footer strong {
-    display: block;
-    margin-bottom: 8px;
-    color: #1a5c9e;
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.signature-line {
-    width: 180px;
-    height: 2px;
-    background: #333;
-    margin: 15px auto;
-    position: relative;
-}
-
-.signature-line::after {
-    content: "التوقيع";
-    position: absolute;
-    top: -25px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 12px;
-    color: #666;
-}
-
-.alert {
-    display: none;
-    padding: 15px;
-    margin: 15px auto;
-    border-radius: 8px;
-    text-align: center;
-    max-width: 500px;
-    font-weight: bold;
-}
-
-.alert.success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert.error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.alert.warning {
-    background: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeaa7;
-}
-
-.watermark {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-45deg);
-    font-size: 90px;
-    color: rgba(26, 92, 158, 0.03);
-    font-weight: bold;
-    pointer-events: none;
-    z-index: 1;
-    font-family: 'Arial', sans-serif;
-}
-
-.report-date {
-    text-align: left;
-    font-size: 13px;
-    color: #666;
-    margin-top: 10px;
-    font-style: italic;
-}
-
-.chart-legend {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 15px;
-    font-size: 12px;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.legend-color {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-}
-
-@media print {
-    .actions-container, .alert, .loading {
-        display: none !important;
+@page{size:A4;margin:0}
+body{
+    font-family:'Segoe UI', Tahoma, Arial, sans-serif;
+    background:#f5f7fa;
+    margin:0;
+    padding:12px;
+    -webkit-text-size-adjust:100%;
+    touch-action:manipulation
+}
+.actions{
+    text-align:center;
+    margin-bottom:12px;
+    background:#fff;
+    padding:15px;
+    border-radius:10px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1)
+}
+button, .btn{
+    background:#25d366;
+    color:#fff;
+    border:none;
+    padding:12px 28px;
+    font-size:16px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    margin:5px;
+    transition:all 0.3s ease;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px
+}
+button:hover, .btn:hover{
+    background:#1da851;
+    transform:translateY(-2px);
+    box-shadow:0 4px 12px rgba(37,211,102,0.3)
+}
+.btn-secondary{
+    background:#1a5c9e
+}
+.btn-secondary:hover{
+    background:#154a80;
+    box-shadow:0 4px 12px rgba(26,92,158,0.3)
+}
+.btn-excel{
+    background:#4caf50
+}
+.btn-excel:hover{
+    background:#388e3c;
+    box-shadow:0 4px 12px rgba(76,175,80,0.3)
+}
+.btn-danger{
+    background:#f44336
+}
+.btn-danger:hover{
+    background:#d32f2f;
+    box-shadow:0 4px 12px rgba(244,67,54,0.3)
+}
+.input-group{
+    margin:15px 0;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center
+}
+input[type="text"], select{
+    padding:12px 15px;
+    border:2px solid #ddd;
+    border-radius:8px;
+    font-size:15px;
+    min-width:250px;
+    transition:all 0.3s ease
+}
+input[type="text"]:focus, select:focus{
+    outline:none;
+    border-color:#25d366;
+    box-shadow:0 0 0 3px rgba(37,211,102,0.1)
+}
+.file-upload{
+    position:relative;
+    display:inline-block
+}
+.file-upload input[type="file"]{
+    position:absolute;
+    left:0;
+    top:0;
+    opacity:0;
+    width:100%;
+    height:100%;
+    cursor:pointer
+}
+.file-label{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:12px 28px;
+    background:#2196f3;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    font-size:16px;
+    transition:all 0.3s ease
+}
+.file-label:hover{
+    background:#1976d2;
+    transform:translateY(-2px)
+}
+.alert{
+    display:none;
+    padding:12px;
+    margin:10px auto;
+    border-radius:8px;
+    text-align:center;
+    max-width:500px;
+    font-weight:bold
+}
+.alert.success{
+    background:#d4edda;
+    color:#155724;
+    border:1px solid #c3e6cb
+}
+.alert.error{
+    background:#f8d7da;
+    color:#721c24;
+    border:1px solid #f5c6cb
+}
+.alert.warning{
+    background:#fff3cd;
+    color:#856404;
+    border:1px solid #ffeaa7
+}
+.loading{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    background:rgba(255,255,255,0.9);
+    z-index:1000;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center
+}
+.spinner{
+    width:50px;
+    height:50px;
+    border:4px solid #f3f3f3;
+    border-top:4px solid #25d366;
+    border-radius:50%;
+    animation:spin 1s linear infinite
+}
+@keyframes spin{
+    0%{transform:rotate(0deg)}
+    100%{transform:rotate(360deg)}
+}
+
+/* تصميم التقرير الرئيسي */
+.page{
+    background:#fff;
+    width:210mm;
+    min-height:297mm;
+    margin:auto;
+    padding:14mm;
+    box-sizing:border-box;
+    box-shadow:0 8px 30px rgba(0,0,0,0.15)
+}
+.header{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    margin-bottom:10px;
+    padding-bottom:15px;
+    border-bottom:2px solid #1a5c9e
+}
+.title{
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+    margin:14px 0;
+    padding:12px;
+    background:#1a5c9e;
+    color:#fff;
+    border-radius:8px;
+    position:relative;
+    overflow:hidden
+}
+.title::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:3px;
+    background:linear-gradient(90deg,#25d366,#4caf50,#2196f3)
+}
+.info{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-bottom:12px
+}
+.box{
+    border:1px solid #ddd;
+    border-radius:8px;
+    padding:12px;
+    text-align:center;
+    font-size:15px;
+    background:#f8fafc;
+    transition:all 0.3s ease
+}
+.box:hover{
+    transform:translateY(-3px);
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    border-color:#1a5c9e
+}
+.box span{
+    display:block;
+    font-weight:bold;
+    margin-top:4px;
+    font-size:16px;
+    color:#1a5c9e
+}
+.summary{
+    border:1px solid #ddd;
+    border-radius:8px;
+    padding:15px;
+    font-size:15px;
+    margin-bottom:14px;
+    background:#f8fafc;
+    line-height:1.8
+}
+.summary strong{
+    color:#1a5c9e;
+    display:inline-block;
+    margin-left:5px
+}
+.section-title{
+    font-size:18px;
+    font-weight:bold;
+    margin:14px 0 8px;
+    color:#1a5c9e;
+    padding-right:10px;
+    border-right:4px solid #25d366
+}
+.table{
+    border:1px solid #ddd;
+    border-radius:8px;
+    overflow:hidden;
+    margin-bottom:12px
+}
+.row{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    border-bottom:1px solid #eee;
+    transition:background 0.3s
+}
+.row:hover{
+    background:#f8fafc
+}
+.row.header-row{
+    background:#1a5c9e;
+    color:#fff;
+    font-weight:bold
+}
+.cell{
+    padding:10px;
+    text-align:center;
+    font-size:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center
+}
+.level{
+    color:#fff;
+    font-weight:bold;
+    padding:5px 12px;
+    border-radius:6px;
+    font-size:14px;
+    min-width:80px
+}
+.excellent{background:#4caf50}
+.verygood{background:#009688}
+.good{background:#2196f3}
+.pass{background:#ff9800}
+.weak{background:#f44336}
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-bottom:14px
+}
+.stat{
+    border:1px solid #ddd;
+    border-radius:8px;
+    padding:12px;
+    text-align:center;
+    font-size:15px;
+    background:white
+}
+.stat strong{
+    display:block;
+    font-size:20px;
+    margin-top:4px;
+    color:#1a5c9e
+}
+.students-section{
+    margin:20px 0
+}
+.students-table{
+    width:100%;
+    border-collapse:collapse;
+    margin:10px 0
+}
+.students-table th{
+    background:#1a5c9e;
+    color:white;
+    padding:12px;
+    font-weight:bold;
+    border:none
+}
+.students-table td{
+    padding:10px;
+    border:1px solid #ddd;
+    text-align:center
+}
+.students-table tr:nth-child(even){
+    background:#f8fafc
+}
+.compare{
+    border:1px solid #ddd;
+    border-radius:8px;
+    padding:15px;
+    margin-bottom:14px;
+    font-size:15px;
+    background:#f8fafc
+}
+.compare p{
+    margin:4px 0
+}
+.charts{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:12px;
+    margin-bottom:14px
+}
+.chart-box{
+    border:1px solid #ddd;
+    border-radius:8px;
+    padding:15px;
+    height:220px;
+    background:white
+}
+.chart-box canvas{
+    width:100%!important;
+    height:190px!important
+}
+.footer{
+    display:flex;
+    justify-content:space-between;
+    font-size:14px;
+    margin-top:14px;
+    padding-top:15px;
+    border-top:2px solid #eee
+}
+.footer div{
+    text-align:center;
+    flex:1
+}
+.footer strong{
+    display:block;
+    margin-bottom:5px;
+    color:#1a5c9e
+}
+.signature-line{
+    width:120px;
+    height:1px;
+    background:#333;
+    margin:8px auto
+}
+.students-navigation{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:15px;
+    margin:15px 0;
+    padding:10px;
+    background:#f8fafc;
+    border-radius:8px
+}
+.nav-btn{
+    background:#1a5c9e;
+    color:white;
+    border:none;
+    width:40px;
+    height:40px;
+    border-radius:8px;
+    font-size:18px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:all 0.3s ease
+}
+.nav-btn:disabled{
+    background:#ccc;
+    cursor:not-allowed
+}
+.nav-btn:hover:not(:disabled){
+    background:#154a80;
+    transform:translateY(-2px)
+}
+.page-info{
+    font-weight:bold;
+    color:#1a5c9e
+}
+.search-filter{
+    display:flex;
+    gap:10px;
+    margin:15px 0;
+    flex-wrap:wrap
+}
+.search-box{
+    flex:1;
+    min-width:200px;
+    position:relative
+}
+.search-box input{
+    width:100%;
+    padding:10px 35px 10px 15px;
+    border:2px solid #ddd;
+    border-radius:8px
+}
+.search-icon{
+    position:absolute;
+    left:12px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#666
+}
+.filter-select{
+    min-width:150px
+}
+
+@media print{
+    .actions,.alert,.loading,.search-filter,.students-navigation{
+        display:none!important
     }
-    
-    body {
-        padding: 0;
-        background: white;
+    body{
+        padding:0;
+        background:#fff
     }
-    
-    .page {
-        box-shadow: none;
-        margin: 0;
-        padding: 15mm;
-        width: 100%;
-        height: auto;
-    }
-    
-    .charts-container {
-        page-break-inside: avoid;
-    }
-    
-    .chart-box {
-        page-break-inside: avoid;
+    .page{
+        box-shadow:none;
+        margin:0;
+        width:100%
     }
 }
-
-@media (max-width: 1200px) {
-    .page {
-        width: 100%;
-        margin: 10px auto;
-        padding: 15mm;
+@media (max-width:1200px){
+    .page{
+        width:100%;
+        margin:10px auto
     }
-    
-    .charts-container {
-        grid-template-columns: repeat(2, 1fr);
+    .charts{
+        grid-template-columns:repeat(2,1fr)
     }
 }
-
-@media (max-width: 768px) {
-    .header {
-        flex-direction: column;
-        gap: 15px;
+@media (max-width:768px){
+    .page{
+        padding:10mm;
+        width:100%
     }
-    
-    .header div {
-        text-align: center !important;
+    .header{
+        flex-direction:column;
+        text-align:center;
+        gap:10px
     }
-    
-    .charts-container {
-        grid-template-columns: 1fr;
-        gap: 20px;
+    .info,.stats{
+        grid-template-columns:repeat(2,1fr)
     }
-    
-    .chart-box {
-        height: 280px;
+    .charts{
+        grid-template-columns:1fr
     }
-    
-    .footer {
-        flex-direction: column;
-        gap: 25px;
-        text-align: center;
+    .chart-box{
+        height:200px
     }
-    
-    .input-field {
-        min-width: 100%;
+    .footer{
+        flex-direction:column;
+        gap:15px;
+        text-align:center
     }
-    
-    .btn {
-        min-width: 100%;
+    .btn,button{
+        width:100%;
+        margin:5px 0
     }
-    
-    .info-grid, .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .input-group{
+        flex-direction:column
+    }
+    input[type="text"],select{
+        width:100%
     }
 }
-
-@media (max-width: 480px) {
-    .info-grid, .stats-grid {
-        grid-template-columns: 1fr;
+@media (max-width:480px){
+    .info,.stats{
+        grid-template-columns:1fr
     }
-    
-    .chart-box {
-        height: 250px;
-        padding: 15px;
+    .row{
+        grid-template-columns:1fr;
+        text-align:center
     }
-    
-    .title {
-        font-size: 22px;
-        padding: 20px;
+    .cell{
+        justify-content:center
     }
-    
-    .section-title {
-        font-size: 18px;
+    .title{
+        font-size:18px
     }
 }
 </style>
 
-<!-- أيقونات Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
 
-<div class="actions-container">
-    <div class="actions-title">
+<div class="actions">
+    <h2 style="color:#1a5c9e;margin-bottom:15px">
         <i class="fas fa-chart-line"></i> نظام تحليل نتائج الاختبارات
+    </h2>
+    
+    <div class="input-group">
+        <input type="text" id="subjectName" placeholder="اسم المادة (مثل: الرياضيات)">
+        <input type="text" id="className" placeholder="الصف (مثل: ثاني متوسط)">
+        <input type="text" id="termName" placeholder="الفصل (مثل: الأول 1447هـ)">
     </div>
     
     <div class="input-group">
-        <div class="input-field">
-            <i class="fas fa-key" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666;"></i>
-            <input type="text" id="apiKey" placeholder="أدخل مفتاح Gemini API للحصول على تحليل ذكي">
+        <input type="number" id="totalScore" placeholder="الدرجة الكاملة للاختبار">
+        <input type="text" id="examDate" placeholder="تاريخ الاختبار">
+    </div>
+    
+    <div class="input-group">
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" placeholder="أدخل أسماء الطلاب ودرجاتهم">
         </div>
-        
-        <div class="file-input-container">
-            <input type="file" id="pdfFile" accept="application/pdf" onchange="handlePDF(this.files[0])">
-            <label for="pdfFile" class="file-label">
-                <i class="fas fa-file-pdf"></i> اختر ملف النتائج (PDF)
+        <div class="file-upload">
+            <input type="file" id="textFile" accept=".txt,.csv" onchange="handleTextFile(this.files[0])">
+            <label class="file-label">
+                <i class="fas fa-file-upload"></i> رفع ملف نصي
             </label>
         </div>
     </div>
     
     <div class="alert" id="alertMessage"></div>
     
-    <div class="buttons-group">
-        <button class="btn" onclick="exportAndShare()">
-            <i class="fab fa-whatsapp"></i> إرسال عبر واتساب (PDF)
+    <div>
+        <button onclick="generateReport()">
+            <i class="fas fa-chart-bar"></i> إنشاء التقرير
         </button>
-        <button class="btn btn-secondary" onclick="printReport()">
-            <i class="fas fa-print"></i> طباعة التقرير
-        </button>
-        <button class="btn btn-secondary" onclick="saveAsImage()">
-            <i class="fas fa-image"></i> حفظ كصورة
-        </button>
-        <button class="btn btn-danger" onclick="resetForm()">
+        <button class="btn-secondary" onclick="clearForm()">
             <i class="fas fa-redo"></i> مسح البيانات
+        </button>
+        <button class="btn-excel" onclick="exportToExcel()">
+            <i class="fas fa-file-excel"></i> تصدير Excel
+        </button>
+        <button onclick="exportAndShare()">
+            <i class="fab fa-whatsapp"></i> مشاركة PDF
         </button>
     </div>
 </div>
 
 <div class="loading" id="loading">
     <div class="spinner"></div>
-    <p>جاري تحليل البيانات وعمل التقرير...</p>
+    <p style="margin-top:15px;font-weight:bold;color:#1a5c9e">جاري إنشاء التقرير...</p>
 </div>
 
 <div class="page" id="report">
-    <div class="watermark">تقرير رسمي</div>
-    
-    <div class="header">
-        <div>
-            <strong>وزارة التعليم</strong><br>
-            الإدارة العامة للتعليم<br>
-            منطقة الرياض التعليمية
-        </div>
-        <div class="logo">
-            <i class="fas fa-school"></i> مدرسة النخبة النموذجية
-        </div>
-        <div>
-            <strong>الاختبار النهائي</strong><br>
-            الفصل الدراسي الثاني<br>
-            1446 هـ / 2024 م
-        </div>
-    </div>
 
-    <div class="title">
-        <i class="fas fa-chart-bar"></i> تقرير تحليل نتائج الاختبار
-        <div class="report-date" id="currentDate"></div>
-    </div>
+<div class="header">
+<div>وزارة التعليم<br>الإدارة العامة للتعليم</div>
+<div style="text-align:center;font-weight:bold">مدرسة النخبة النموذجية</div>
+<div>الاختبار النهائي</div>
+</div>
 
-    <div class="info-grid">
-        <div class="info-box">
-            <i class="fas fa-book" style="color: #1a5c9e; margin-bottom: 8px; font-size: 20px;"></i>
-            المادة
-            <span id="subject">-</span>
-        </div>
-        <div class="info-box">
-            <i class="fas fa-graduation-cap" style="color: #1a5c9e; margin-bottom: 8px; font-size: 20px;"></i>
-            الصف
-            <span id="grade">-</span>
-        </div>
-        <div class="info-box">
-            <i class="fas fa-calendar-alt" style="color: #1a5c9e; margin-bottom: 8px; font-size: 20px;"></i>
-            الفصل
-            <span id="term">-</span>
-        </div>
-        <div class="info-box">
-            <i class="fas fa-star" style="color: #1a5c9e; margin-bottom: 8px; font-size: 20px;"></i>
-            الدرجة الكاملة
-            <span id="maxScore">-</span>
-        </div>
-        <div class="info-box">
-            <i class="fas fa-clock" style="color: #1a5c9e; margin-bottom: 8px; font-size: 20px;"></i>
-            تاريخ الاختبار
-            <span id="examDate">-</span>
-        </div>
-    </div>
+<div class="title">تقرير تحليل نتائج اختبار مادة <span id="reportSubject">الرياضيات</span></div>
 
-    <div class="section-title">
-        <i class="fas fa-analysis"></i> التحليل العام للنتائج
-    </div>
-    
-    <div class="analysis-section">
-        <div class="analysis-header">
-            <strong style="font-size: 16px;">ملخص التحليل الإحصائي</strong>
-            <span class="badge" id="analysisStatus" style="background: #e0e0e0; padding: 6px 12px; border-radius: 20px; font-size: 13px;">
-                <i class="fas fa-clock"></i> قيد الانتظار
-            </span>
-        </div>
-        <div id="analysisText" style="text-align: justify; line-height: 1.9; font-size: 15px;">
-            سيظهر هنا التحليل الذكي للنتائج بعد رفع ملف PDF وإدخال مفتاح API. سيتضمن التقرير تحليلًا شاملاً للأداء ومقارنات مع النتائج السابقة وتوصيات للتحسين.
-        </div>
-    </div>
+<div class="info">
+<div class="box">الصف<span id="reportClass">ثاني متوسط</span></div>
+<div class="box">الفصل<span id="reportTerm">الأول 1447هـ</span></div>
+<div class="box">درجة الاختبار<span id="reportTotalScore">40</span></div>
+</div>
 
-    <div class="section-title">
-        <i class="fas fa-chart-pie"></i> الإحصائيات الرئيسية
-    </div>
+<div class="summary">
+<strong>مستوى الأداء العام:</strong> <span id="overallLevel">جيد جدًا</span><br>
+<strong>نسبة الطلاب دون مستوى الإتقان:</strong> <span id="belowMastery">25%</span><br>
+<strong>قراءة تحليلية مختصرة:</strong>
+<span id="analysisText">تعكس النتائج استقرارًا جيدًا في مستوى التحصيل مع وجود فئة محدودة تحتاج دعمًا إضافيًا.</span>
+</div>
 
-    <div class="stats-grid">
-        <div class="stat-box info">
-            <i class="fas fa-users" style="font-size: 28px; color: #2196f3; margin-bottom: 12px;"></i>
-            عدد الطلاب
-            <strong id="studentsCount">-</strong>
-        </div>
-        <div class="stat-box success">
-            <i class="fas fa-calculator" style="font-size: 28px; color: #4caf50; margin-bottom: 12px;"></i>
-            المتوسط
-            <strong id="averageScore">-</strong>
-        </div>
-        <div class="stat-box">
-            <i class="fas fa-trophy" style="font-size: 28px; color: #ff9800; margin-bottom: 12px;"></i>
-            أعلى درجة
-            <strong id="maxStudentScore">-</strong>
-        </div>
-        <div class="stat-box warning">
-            <i class="fas fa-exclamation-triangle" style="font-size: 28px; color: #ff9800; margin-bottom: 12px;"></i>
-            أدنى درجة
-            <strong id="minStudentScore">-</strong>
-        </div>
-        <div class="stat-box success">
-            <i class="fas fa-percentage" style="font-size: 28px; color: #4caf50; margin-bottom: 12px;"></i>
-            نسبة النجاح
-            <strong id="successRate">-</strong>
-        </div>
-    </div>
+<div class="section-title">توزيع الطلاب حسب المستوى</div>
 
-    <div class="section-title">
-        <i class="fas fa-chart-area"></i> الرسوم البيانية الإحصائية
-    </div>
+<div class="table">
+<div class="row header-row">
+    <div class="cell">عدد الطلاب</div>
+    <div class="cell">النطاق</div>
+    <div class="cell">المستوى</div>
+</div>
+<div class="row">
+    <div class="cell" id="excellentCount">7</div>
+    <div class="cell" id="excellentRange">36 - 40</div>
+    <div class="cell"><span class="level excellent">ممتاز</span></div>
+</div>
+<div class="row">
+    <div class="cell" id="verygoodCount">5</div>
+    <div class="cell" id="verygoodRange">32 - 35.99</div>
+    <div class="cell"><span class="level verygood">جيد جدًا</span></div>
+</div>
+<div class="row">
+    <div class="cell" id="goodCount">3</div>
+    <div class="cell" id="goodRange">28 - 31.99</div>
+    <div class="cell"><span class="level good">جيد</span></div>
+</div>
+<div class="row">
+    <div class="cell" id="passCount">2</div>
+    <div class="cell" id="passRange">20 - 27.99</div>
+    <div class="cell"><span class="level pass">مقبول</span></div>
+</div>
+<div class="row">
+    <div class="cell" id="weakCount">3</div>
+    <div class="cell" id="weakRange">0 - 19.99</div>
+    <div class="cell"><span class="level weak">ضعيف</span></div>
+</div>
+</div>
 
-    <div class="charts-container">
-        <div class="chart-box">
-            <div class="chart-title">
-                <i class="fas fa-chart-bar"></i> توزيع الدرجات
-            </div>
-            <div class="chart-container">
-                <canvas id="distributionChart"></canvas>
-            </div>
-            <div class="chart-legend" id="distributionLegend"></div>
-        </div>
-        
-        <div class="chart-box">
-            <div class="chart-title">
-                <i class="fas fa-chart-pie"></i> نسبة النجاح والرسوب
-            </div>
-            <div class="chart-container">
-                <canvas id="successChart"></canvas>
-            </div>
-            <div class="chart-legend" id="successLegend"></div>
-        </div>
-        
-        <div class="chart-box">
-            <div class="chart-title">
-                <i class="fas fa-chart-line"></i> توزيع التقديرات
-            </div>
-            <div class="chart-container">
-                <canvas id="gradesChart"></canvas>
-            </div>
-            <div class="chart-legend" id="gradesLegend"></div>
-        </div>
-    </div>
+<div class="stats">
+<div class="stat">عدد الطلاب<strong id="totalStudents">20</strong></div>
+<div class="stat">المتوسط<strong id="averageScore">30.7</strong></div>
+<div class="stat">نسبة النجاح<strong id="successRate">85%</strong></div>
+</div>
 
-    <div class="footer">
-        <div>
-            <strong>مدير المدرسة</strong>
-            <div class="signature-line"></div>
-            د. عبدالله محمد الشمراني
-        </div>
-        <div>
-            <strong>رئيس القسم</strong>
-            <div class="signature-line"></div>
-            أ. خالد إبراهيم العتيبي
-        </div>
-        <div>
-            <strong>معلم المادة</strong>
-            <div class="signature-line"></div>
-            أ. سعيد علي الغامدي
-        </div>
+<div class="section-title">قائمة الطلاب والدرجات</div>
+
+<div class="search-filter">
+    <div class="search-box">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="studentSearch" placeholder="بحث عن طالب..." oninput="filterStudents()">
     </div>
+    <select class="filter-select" id="gradeFilter" onchange="filterStudents()">
+        <option value="">جميع التقديرات</option>
+        <option value="ممتاز">ممتاز</option>
+        <option value="جيد جدًا">جيد جدًا</option>
+        <option value="جيد">جيد</option>
+        <option value="مقبول">مقبول</option>
+        <option value="ضعيف">ضعيف</option>
+    </select>
+</div>
+
+<div class="students-section">
+    <table class="students-table" id="studentsTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>اسم الطالب</th>
+                <th>الدرجة</th>
+                <th>النسبة</th>
+                <th>التقدير</th>
+            </tr>
+        </thead>
+        <tbody id="studentsTableBody">
+            <!-- سيتم ملؤها جينياً -->
+        </tbody>
+    </table>
+</div>
+
+<div class="students-navigation">
+    <button class="nav-btn" onclick="prevPage()" id="prevBtn">
+        <i class="fas fa-chevron-right"></i>
+    </button>
+    <span class="page-info" id="pageInfo">الصفحة 1 من 1</span>
+    <button class="nav-btn" onclick="nextPage()" id="nextBtn">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+</div>
+
+<div class="section-title">مقارنة الصفوف (حتى 10 فصول – مرتبة حسب المتوسط)</div>
+
+<div class="compare">
+<p>يعرض المخطط متوسط الدرجات ونسبة دون مستوى الإتقان مرتبة من الأعلى إلى الأدنى.</p>
+</div>
+
+<div class="charts">
+<div class="chart-box"><canvas id="avgChart"></canvas></div>
+<div class="chart-box"><canvas id="lowChart"></canvas></div>
+<div class="chart-box"><canvas id="pieChart"></canvas></div>
+</div>
+
+<div class="footer">
+<div>
+    <strong>مدير المدرسة</strong>
+    <div class="signature-line"></div>
+    د. عبدالله محمد الشمراني
+</div>
+<div>
+    <strong>رئيس القسم</strong>
+    <div class="signature-line"></div>
+    أ. خالد إبراهيم العتيبي
+</div>
+<div>
+    <strong>معلم المادة</strong>
+    <div class="signature-line"></div>
+    أ. سعيد علي الغامدي
+</div>
+</div>
+
 </div>
 
 <script>
-// تهيئة متغيرات المخططات
-let distributionChart, successChart, gradesChart;
+// البيانات العالمية
+let studentsData = [];
+let filteredStudents = [];
+let currentPage = 1;
+const studentsPerPage = 10;
+let avgChart, lowChart, pieChart;
 
-// تحديث التاريخ الحالي
-function updateCurrentDate() {
-    const now = new Date();
-    const options = { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric',
-        weekday: 'long'
+// بيانات الصفوف للمقارنة
+const classes = ["2/أ", "2/ب", "2/ج", "2/د", "2/هـ", "2/و", "2/ز", "2/ح", "2/ط", "2/ي"];
+const averages = [33.5, 32.1, 31.8, 30.9, 30.2, 29.7, 29.3, 28.9, 28.4, 27.8];
+const belowMastery = [12, 18, 20, 22, 25, 27, 30, 32, 35, 38];
+
+// معالجة الملف النصي
+function handleTextFile(file) {
+    if (!file) return;
+    
+    showLoading(true);
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const text = e.target.result;
+            parseStudentData(text);
+            showAlert('تم تحميل بيانات الطلاب بنجاح', 'success');
+        } catch (error) {
+            console.error('خطأ في قراءة الملف:', error);
+            showAlert('خطأ في قراءة الملف. تأكد من صحة البيانات', 'error');
+        } finally {
+            showLoading(false);
+        }
     };
-    const hijriDate = now.toLocaleDateString('ar-SA', options);
-    document.getElementById('currentDate').textContent = `تاريخ التقرير: ${hijriDate}`;
+    
+    reader.onerror = function() {
+        showAlert('خطأ في قراءة الملف', 'error');
+        showLoading(false);
+    };
+    
+    reader.readAsText(file, 'UTF-8');
 }
 
-// إنشاء مخططات محسنة
-function initEnhancedCharts(data) {
+// تحليل بيانات الطلاب من النص
+function parseStudentData(text) {
+    studentsData = [];
+    const lines = text.split('\n');
+    
+    lines.forEach(line => {
+        line = line.trim();
+        if (!line) return;
+        
+        // محاولة التعرّف على تنسيقات مختلفة
+        let name = '', score = 0;
+        
+        // تنسيق: اسم الطالب، الدرجة
+        if (line.includes(',')) {
+            const parts = line.split(',');
+            name = parts[0].trim();
+            score = parseFloat(parts[1].trim());
+        }
+        // تنسيق: اسم الطالب - الدرجة
+        else if (line.includes('-')) {
+            const parts = line.split('-');
+            name = parts[0].trim();
+            score = parseFloat(parts[1].trim());
+        }
+        // تنسيق: اسم الطالب الدرجة
+        else {
+            const parts = line.split(/\s+/);
+            if (parts.length >= 2) {
+                score = parseFloat(parts[parts.length - 1]);
+                name = parts.slice(0, parts.length - 1).join(' ');
+            }
+        }
+        
+        if (name && !isNaN(score)) {
+            const totalScore = parseInt(document.getElementById('totalScore').value) || 40;
+            const percentage = ((score / totalScore) * 100).toFixed(1);
+            const grade = calculateGrade(percentage);
+            
+            studentsData.push({
+                name: name,
+                score: score,
+                percentage: percentage,
+                grade: grade
+            });
+        }
+    });
+    
+    if (studentsData.length > 0) {
+        showAlert(`تم تحليل ${studentsData.length} طالباً`, 'success');
+        displayStudents();
+    } else {
+        // استخدام بيانات تجريبية
+        generateSampleData();
+    }
+}
+
+// حساب التقدير بناءً على النسبة
+function calculateGrade(percentage) {
+    if (percentage >= 90) return "ممتاز";
+    if (percentage >= 80) return "جيد جدًا";
+    if (percentage >= 70) return "جيد";
+    if (percentage >= 60) return "مقبول";
+    return "ضعيف";
+}
+
+// توليد بيانات تجريبية
+function generateSampleData() {
+    const sampleNames = [
+        "أحمد محمد العتيبي", "محمد عبدالله الشمراني", "سعيد علي الغامدي",
+        "خالد إبراهيم الرشيد", "عبدالرحمن سعد الحربي", "فهد ناصر المطيري",
+        "تركي سليمان القحطاني", "يوسف حمد السليمان", "عمر صالح العصيمي",
+        "بدر عبدالعزيز الشهري", "سلطان راشد الدوسري", "نواف مطلق العجمي",
+        "وليد فيصل الزهراني", "ماجد حامد القصير", "هاني عبدالمحسن البلوي",
+        "ناصر علي القحطاني", "راشد سعد المطيري", "سلمان عبدالله الشهري",
+        "فيصل محمد العصيمي", "طارق خالد الرشيد"
+    ];
+    
+    const totalScore = parseInt(document.getElementById('totalScore').value) || 40;
+    
+    studentsData = sampleNames.map((name, index) => {
+        // توزيع عشوائي للدرجات مع تنوع
+        let score;
+        if (index < 7) score = Math.floor(Math.random() * 5) + 36; // ممتاز
+        else if (index < 12) score = Math.floor(Math.random() * 4) + 32; // جيد جدًا
+        else if (index < 15) score = Math.floor(Math.random() * 4) + 28; // جيد
+        else if (index < 17) score = Math.floor(Math.random() * 8) + 20; // مقبول
+        else score = Math.floor(Math.random() * 20); // ضعيف
+        
+        const percentage = ((score / totalScore) * 100).toFixed(1);
+        const grade = calculateGrade(percentage);
+        
+        return {
+            name: name,
+            score: score,
+            percentage: percentage,
+            grade: grade
+        };
+    });
+}
+
+// إنشاء التقرير
+function generateReport() {
+    // الحصول على البيانات من الحقول
+    const subject = document.getElementById('subjectName').value || 'الرياضيات';
+    const className = document.getElementById('className').value || 'ثاني متوسط';
+    const term = document.getElementById('termName').value || 'الأول 1447هـ';
+    const totalScore = document.getElementById('totalScore').value || '40';
+    const examDate = document.getElementById('examDate').value || '';
+    
+    // إذا لم تكن هناك بيانات طلاب، إنشاء بيانات تجريبية
+    if (studentsData.length === 0) {
+        generateSampleData();
+    }
+    
+    // تحديث معلومات التقرير
+    document.getElementById('reportSubject').textContent = subject;
+    document.getElementById('reportClass').textContent = className;
+    document.getElementById('reportTerm').textContent = term;
+    document.getElementById('reportTotalScore').textContent = totalScore;
+    
+    // حساب الإحصائيات
+    calculateStatistics();
+    
+    // عرض الطلاب
+    displayStudents();
+    
+    // إنشاء المخططات
+    createCharts();
+    
+    // إضافة نص تحليلي بناءً على النتائج
+    generateAnalysisText();
+    
+    showAlert('تم إنشاء التقرير بنجاح', 'success');
+    
+    // التمرير إلى التقرير
+    document.getElementById('report').scrollIntoView({ behavior: 'smooth' });
+}
+
+// حساب الإحصائيات
+function calculateStatistics() {
+    const totalScore = parseInt(document.getElementById('totalScore').value) || 40;
+    
+    let excellentCount = 0, verygoodCount = 0, goodCount = 0, passCount = 0, weakCount = 0;
+    let total = 0, sum = 0, maxScore = 0, minScore = totalScore;
+    let passedCount = 0;
+    
+    studentsData.forEach(student => {
+        total++;
+        sum += student.score;
+        maxScore = Math.max(maxScore, student.score);
+        minScore = Math.min(minScore, student.score);
+        
+        if (student.score >= (totalScore * 0.6)) passedCount++;
+        
+        switch(student.grade) {
+            case 'ممتاز': excellentCount++; break;
+            case 'جيد جدًا': verygoodCount++; break;
+            case 'جيد': goodCount++; break;
+            case 'مقبول': passCount++; break;
+            case 'ضعيف': weakCount++; break;
+        }
+    });
+    
+    const average = (sum / total).toFixed(1);
+    const successRate = ((passedCount / total) * 100).toFixed(1);
+    const belowMasteryRate = ((weakCount + passCount) / total * 100).toFixed(1);
+    
+    // تحديث الإحصائيات
+    document.getElementById('totalStudents').textContent = total;
+    document.getElementById('averageScore').textContent = average;
+    document.getElementById('successRate').textContent = successRate + '%';
+    document.getElementById('belowMastery').textContent = belowMasteryRate + '%';
+    
+    // تحديث توزيع التقديرات
+    document.getElementById('excellentCount').textContent = excellentCount;
+    document.getElementById('verygoodCount').textContent = verygoodCount;
+    document.getElementById('goodCount').textContent = goodCount;
+    document.getElementById('passCount').textContent = passCount;
+    document.getElementById('weakCount').textContent = weakCount;
+    
+    // تحديد مستوى الأداء العام
+    let overallLevel = '';
+    if (parseFloat(successRate) >= 90) overallLevel = 'ممتاز';
+    else if (parseFloat(successRate) >= 80) overallLevel = 'جيد جدًا';
+    else if (parseFloat(successRate) >= 70) overallLevel = 'جيد';
+    else if (parseFloat(successRate) >= 60) overallLevel = 'مقبول';
+    else overallLevel = 'ضعيف';
+    
+    document.getElementById('overallLevel').textContent = overallLevel;
+}
+
+// إنشاء نص تحليلي
+function generateAnalysisText() {
+    const totalStudents = studentsData.length;
+    const successRate = parseFloat(document.getElementById('successRate').textContent);
+    const averageScore = parseFloat(document.getElementById('averageScore').textContent);
+    const totalScore = parseInt(document.getElementById('reportTotalScore').textContent);
+    
+    let analysis = '';
+    
+    if (successRate >= 90) {
+        analysis = `أظهرت النتائج تميزاً واضحاً في مستوى التحصيل حيث بلغت نسبة النجاح ${successRate}%. يعكس هذا المستوى تفوق الطلاب وإتقانهم للمهارات المطلوبة.`;
+    } else if (successRate >= 80) {
+        analysis = `تشير النتائج إلى مستوى جيد جداً من التحصيل بنسبة نجاح ${successRate}% ومتوسط ${averageScore}/${totalScore}. هناك مجال للتحسين لتحقيق التميز الكامل.`;
+    } else if (successRate >= 70) {
+        analysis = `النسبة ${successRate}% تدل على مستوى جيد مع وجود فئة تحتاج إلى دعم إضافي. يوصى بتقديم تدريبات مكثفة للطلاب ذوي الدرجات المنخفضة.`;
+    } else if (successRate >= 60) {
+        analysis = `النسبة ${successRate}% تشير إلى حاجة لمراجعة استراتيجيات التدريس. يوصى بإعادة تقييم المنهج وتقديم برامج دعم مكثفة.`;
+    } else {
+        analysis = `النسبة ${successRate}% تعكس ضعفاً في التحصيل يحتاج إلى تدخل عاجل. يوصى بإعادة تدريس المهارات الأساسية وتقديم برامج علاجية.`;
+    }
+    
+    document.getElementById('analysisText').textContent = analysis;
+}
+
+// عرض قائمة الطلاب
+function displayStudents() {
+    const searchTerm = document.getElementById('studentSearch').value.toLowerCase();
+    const gradeFilter = document.getElementById('gradeFilter').value;
+    
+    // تصفية الطلاب
+    filteredStudents = studentsData.filter(student => {
+        const matchesSearch = student.name.toLowerCase().includes(searchTerm);
+        const matchesGrade = !gradeFilter || student.grade === gradeFilter;
+        return matchesSearch && matchesGrade;
+    });
+    
+    // حساب عدد الصفحات
+    const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+    
+    // تحديث أزرار التصفح
+    document.getElementById('prevBtn').disabled = currentPage <= 1;
+    document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+    document.getElementById('pageInfo').textContent = `الصفحة ${currentPage} من ${totalPages}`;
+    
+    // حساب بداية ونهاية الصفحة الحالية
+    const startIndex = (currentPage - 1) * studentsPerPage;
+    const endIndex = Math.min(startIndex + studentsPerPage, filteredStudents.length);
+    const pageStudents = filteredStudents.slice(startIndex, endIndex);
+    
+    // إنشاء جدول الطلاب
+    const tableBody = document.getElementById('studentsTableBody');
+    tableBody.innerHTML = '';
+    
+    if (pageStudents.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 20px; color: #666;">
+                    <i class="fas fa-users" style="font-size: 30px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                    لا توجد بيانات للعرض
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    pageStudents.forEach((student, index) => {
+        const rowNumber = startIndex + index + 1;
+        const gradeClass = getGradeClass(student.grade);
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${rowNumber}</td>
+            <td style="text-align: right; font-weight: bold;">${student.name}</td>
+            <td><strong>${student.score}</strong></td>
+            <td>${student.percentage}%</td>
+            <td><span class="${gradeClass}" style="padding: 5px 10px; border-radius: 4px; color: white; font-weight: bold;">${student.grade}</span></td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+// الحصول على كلاس CSS للتقدير
+function getGradeClass(grade) {
+    switch(grade) {
+        case 'ممتاز': return 'excellent';
+        case 'جيد جدًا': return 'verygood';
+        case 'جيد': return 'good';
+        case 'مقبول': return 'pass';
+        case 'ضعيف': return 'weak';
+        default: return '';
+    }
+}
+
+// تصفية الطلاب
+function filterStudents() {
+    currentPage = 1;
+    displayStudents();
+}
+
+// الصفحة التالية
+function nextPage() {
+    const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+    if (currentPage < totalPages) {
+        currentPage++;
+        displayStudents();
+        document.getElementById('studentsTable').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+// الصفحة السابقة
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        displayStudents();
+        document.getElementById('studentsTable').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+// إنشاء المخططات
+function createCharts() {
     // تدمير المخططات القديمة إن وجدت
-    if (distributionChart) distributionChart.destroy();
-    if (successChart) successChart.destroy();
-    if (gradesChart) gradesChart.destroy();
+    if (avgChart) avgChart.destroy();
+    if (lowChart) lowChart.destroy();
+    if (pieChart) pieChart.destroy();
     
-    const maxScore = parseInt(data.max_score) || 100;
-    const averageScore = data.stats.average || 0;
-    const successRate = data.stats.success || 0;
-    const gradeLevels = data.levels || [0, 0, 0, 0, 0];
-    const gradeLabels = ['ممتاز', 'جيد جدًا', 'جيد', 'مقبول', 'ضعيف'];
-    const gradeColors = ['#4caf50', '#009688', '#2196f3', '#ff9800', '#f44336'];
-    const gradeBorderColors = ['#388e3c', '#00796b', '#1976d2', '#f57c00', '#d32f2f'];
-    
-    // 1. مخطط توزيع الدرجات (شريطي أفقي)
-    const distributionCtx = document.getElementById('distributionChart').getContext('2d');
-    distributionChart = new Chart(distributionCtx, {
+    // مخطط متوسطات الصفوف
+    const avgCtx = document.getElementById('avgChart').getContext('2d');
+    avgChart = new Chart(avgCtx, {
         type: 'bar',
         data: {
-            labels: ['المتوسط', 'الأعلى', 'الأدنى'],
+            labels: classes,
             datasets: [{
-                label: 'الدرجات',
-                data: [averageScore, data.stats.max || 0, data.stats.min || 0],
-                backgroundColor: [
-                    'rgba(37, 211, 102, 0.8)',
-                    'rgba(255, 152, 0, 0.8)',
-                    'rgba(244, 67, 54, 0.8)'
-                ],
-                borderColor: [
-                    '#25d366',
-                    '#ff9800',
-                    '#f44336'
-                ],
-                borderWidth: 2,
-                borderRadius: 8,
-                barPercentage: 0.6
+                data: averages,
+                backgroundColor: '#1a5c9e',
+                barThickness: 18
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            indexAxis: 'y',
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    max: maxScore,
-                    grid: {
-                        color: 'rgba(0,0,0,0.05)',
-                        drawBorder: false
-                    },
-                    ticks: {
-                        font: {
-                            size: 12,
-                            family: 'Tahoma'
-                        },
-                        color: '#555'
-                    },
-                    title: {
-                        display: true,
-                        text: 'الدرجة',
-                        font: {
-                            size: 13,
-                            weight: 'bold'
-                        },
-                        color: '#1a5c9e'
-                    }
-                },
-                y: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        font: {
-                            size: 14,
-                            weight: 'bold',
-                            family: 'Tahoma'
-                        },
-                        color: '#333'
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => `المتوسط: ${ctx.raw} درجة`
                     }
                 }
             },
-            plugins: {
-                legend: {
-                    display: false
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 40,
+                    ticks: { stepSize: 5, font: { size: 13 } }
                 },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    titleFont: {
-                        size: 13,
-                        family: 'Tahoma'
-                    },
-                    bodyFont: {
-                        size: 13,
-                        family: 'Tahoma'
-                    },
-                    padding: 10,
-                    cornerRadius: 8,
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.label}: ${context.raw} من ${maxScore}`;
-                        }
-                    }
-                }
+                x: { ticks: { font: { size: 13 } } }
             }
         }
     });
     
-    // تحديث وسيلة الإيضاح
-    document.getElementById('distributionLegend').innerHTML = `
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #25d366;"></div>
-            <span>المتوسط</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #ff9800;"></div>
-            <span>الأعلى</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #f44336;"></div>
-            <span>الأدنى</span>
-        </div>
-    `;
-    
-    // 2. مخطط النجاح والرسوب (دائري مجوف)
-    const successCtx = document.getElementById('successChart').getContext('2d');
-    successChart = new Chart(successCtx, {
-        type: 'doughnut',
+    // مخطط نسبة دون الإتقان
+    const lowCtx = document.getElementById('lowChart').getContext('2d');
+    lowChart = new Chart(lowCtx, {
+        type: 'bar',
         data: {
-            labels: ['نسبة النجاح', 'نسبة الرسوب'],
+            labels: classes,
             datasets: [{
-                data: [successRate, 100 - successRate],
-                backgroundColor: [
-                    'rgba(76, 175, 80, 0.9)',
-                    'rgba(244, 67, 54, 0.9)'
-                ],
-                borderColor: [
-                    '#4caf50',
-                    '#f44336'
-                ],
-                borderWidth: 3,
-                hoverOffset: 15,
-                hoverBorderWidth: 4
+                data: belowMastery,
+                backgroundColor: '#f44336',
+                barThickness: 18
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '70%',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => `دون الإتقان: ${ctx.raw}%`
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        stepSize: 10,
+                        font: { size: 13 },
+                        callback: v => v + '%'
+                    }
+                },
+                x: { ticks: { font: { size: 13 } } }
+            }
+        }
+    });
+    
+    // مخطط دائري للتقديرات
+    const excellentCount = parseInt(document.getElementById('excellentCount').textContent) || 0;
+    const verygoodCount = parseInt(document.getElementById('verygoodCount').textContent) || 0;
+    const goodCount = parseInt(document.getElementById('goodCount').textContent) || 0;
+    const passCount = parseInt(document.getElementById('passCount').textContent) || 0;
+    const weakCount = parseInt(document.getElementById('weakCount').textContent) || 0;
+    const total = excellentCount + verygoodCount + goodCount + passCount + weakCount;
+    
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    pieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: ["ممتاز", "جيد جدًا", "جيد", "مقبول", "ضعيف"],
+            datasets: [{
+                data: [
+                    (excellentCount / total * 100).toFixed(1),
+                    (verygoodCount / total * 100).toFixed(1),
+                    (goodCount / total * 100).toFixed(1),
+                    (passCount / total * 100).toFixed(1),
+                    (weakCount / total * 100).toFixed(1)
+                ],
+                backgroundColor: ["#4caf50", "#009688", "#2196f3", "#ff9800", "#f44336"]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     position: 'bottom',
-                    labels: {
-                        font: {
-                            size: 13,
-                            family: 'Tahoma',
-                            weight: 'bold'
-                        },
-                        padding: 20,
-                        usePointStyle: true,
-                        pointStyle: 'circle'
-                    }
+                    labels: { font: { size: 13 } }
                 },
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
-                            return `${context.label}: ${context.raw.toFixed(1)}%`;
-                        }
-                    },
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    titleFont: {
-                        size: 13,
-                        family: 'Tahoma'
-                    },
-                    bodyFont: {
-                        size: 14,
-                        family: 'Tahoma',
-                        weight: 'bold'
+                        label: (ctx) => `${ctx.label}: ${ctx.raw}%`
                     }
                 }
-            },
-            animation: {
-                animateScale: true,
-                animateRotate: true,
-                duration: 1000
             }
         }
     });
-    
-    // تحديث وسيلة الإيضاح
-    document.getElementById('successLegend').innerHTML = `
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #4caf50;"></div>
-            <span>النجاح: ${successRate.toFixed(1)}%</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #f44336;"></div>
-            <span>الرسوب: ${(100 - successRate).toFixed(1)}%</span>
-        </div>
-    `;
-    
-    // 3. مخطط توزيع التقديرات (خطي مع نقاط)
-    const gradesCtx = document.getElementById('gradesChart').getContext('2d');
-    gradesChart = new Chart(gradesCtx, {
-        type: 'line',
-        data: {
-            labels: gradeLabels,
-            datasets: [{
-                label: 'عدد الطلاب',
-                data: gradeLevels,
-                backgroundColor: 'rgba(26, 92, 158, 0.1)',
-                borderColor: '#1a5c9e',
-                borderWidth: 3,
-                pointBackgroundColor: gradeColors,
-                pointBorderColor: gradeBorderColors,
-                pointBorderWidth: 2,
-                pointRadius: 8,
-                pointHoverRadius: 10,
-                fill: true,
-                tension: 0.3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(0,0,0,0.05)',
-                        drawBorder: false
-                    },
-                    ticks: {
-                        font: {
-                            size: 12,
-                            family: 'Tahoma'
-                        },
-                        color: '#555'
-                    },
-                    title: {
-                        display: true,
-                        text: 'عدد الطلاب',
-                        font: {
-                            size: 13,
-                            weight: 'bold'
-                        },
-                        color: '#1a5c9e'
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        font: {
-                            size: 13,
-                            weight: 'bold',
-                            family: 'Tahoma'
-                        },
-                        color: '#333'
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    titleFont: {
-                        size: 13,
-                        family: 'Tahoma'
-                    },
-                    bodyFont: {
-                        size: 13,
-                        family: 'Tahoma'
-                    },
-                    padding: 10,
-                    cornerRadius: 8,
-                    callbacks: {
-                        label: function(context) {
-                            const total = gradeLevels.reduce((a, b) => a + b, 0);
-                            const percentage = total > 0 ? ((context.raw / total) * 100).toFixed(1) : 0;
-                            return `${context.label}: ${context.raw} طالب (${percentage}%)`;
-                        }
-                    }
-                }
-            },
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutQuart'
-            }
-        }
-    });
-    
-    // تحديث وسيلة الإيضاح
-    let gradesLegendHTML = '';
-    gradeLabels.forEach((label, index) => {
-        const count = gradeLevels[index] || 0;
-        const total = gradeLevels.reduce((a, b) => a + b, 0);
-        const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
-        
-        gradesLegendHTML += `
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: ${gradeColors[index]};"></div>
-                <span>${label}: ${count} (${percentage}%)</span>
-            </div>
-        `;
-    });
-    document.getElementById('gradesLegend').innerHTML = gradesLegendHTML;
 }
 
-// معالجة ملف PDF
-async function handlePDF(file) {
-    if (!file) {
-        showAlert('الرجاء اختيار ملف PDF أولاً', 'error');
+// تصدير إلى Excel
+function exportToExcel() {
+    if (studentsData.length === 0) {
+        showAlert('لا توجد بيانات للتصدير', 'warning');
         return;
     }
     
-    // التحقق من حجم الملف
-    if (file.size > 10 * 1024 * 1024) { // 10MB
-        showAlert('حجم الملف كبير جداً. الرجاء اختيار ملف أصغر من 10MB', 'error');
-        return;
-    }
-    
-    document.getElementById('loading').style.display = 'block';
-    showAlert('جاري قراءة ملف PDF وتحليل البيانات...', 'warning');
+    showLoading(true);
     
     try {
-        const reader = new FileReader();
+        // تحضير البيانات
+        const excelData = [
+            ['#', 'اسم الطالب', 'الدرجة', 'النسبة المئوية', 'التقدير']
+        ];
         
-        reader.onload = async function(event) {
-            try {
-                const typedarray = new Uint8Array(event.target.result);
-                const pdf = await pdfjsLib.getDocument({data: typedarray}).promise;
-                let text = '';
-                
-                // استخراج النص من أول 5 صفحات (لتحسين السرعة)
-                const pageLimit = Math.min(pdf.numPages, 5);
-                for (let i = 1; i <= pageLimit; i++) {
-                    const page = await pdf.getPage(i);
-                    const content = await page.getTextContent();
-                    content.items.forEach(item => {
-                        text += item.str + ' ';
-                    });
-                }
-                
-                await analyzeWithGemini(text);
-                
-            } catch (error) {
-                console.error('خطأ في قراءة ملف PDF:', error);
-                showAlert('خطأ في قراءة ملف PDF. تأكد من صحة الملف.', 'error');
-                document.getElementById('loading').style.display = 'none';
-            }
-        };
-        
-        reader.onerror = function() {
-            showAlert('خطأ في قراءة الملف. حاول مرة أخرى.', 'error');
-            document.getElementById('loading').style.display = 'none';
-        };
-        
-        reader.readAsArrayBuffer(file);
-        
-    } catch (error) {
-        console.error('خطأ في معالجة الملف:', error);
-        showAlert('حدث خطأ غير متوقع في معالجة الملف.', 'error');
-        document.getElementById('loading').style.display = 'none';
-    }
-}
-
-// تحليل النص باستخدام Gemini API
-async function analyzeWithGemini(text) {
-    const apiKey = document.getElementById('apiKey').value.trim();
-    
-    if (!apiKey) {
-        showAlert('الرجاء إدخال مفتاح Gemini API للحصول على تحليل ذكي', 'warning');
-        useSampleData();
-        document.getElementById('loading').style.display = 'none';
-        return;
-    }
-    
-    try {
-        const prompt = `أنت محلل نتائج طلاب محترف. قم بتحليل ملف النتائج هذا واستخرج المعلومات التالية:
-
-1. معلومات عامة:
-- اسم المادة (مثل: الرياضيات، العلوم، اللغة العربية)
-- الصف الدراسي (مثل: الثالث الثانوي، الثاني المتوسط)
-- الفصل الدراسي (مثل: الأول، الثاني)
-- درجة الاختبار الكاملة (رقم)
-- تاريخ الاختبار (بالهجري أو الميلادي)
-
-2. التقديرات (عدد الطلاب في كل فئة):
-- ممتاز (90-100%)
-- جيد جداً (80-89%)
-- جيد (70-79%)
-- مقبول (60-69%)
-- ضعيف (أقل من 60%)
-
-3. إحصائيات:
-- عدد الطلاب
-- متوسط الدرجات
-- أعلى درجة
-- أدنى درجة
-- نسبة النجاح (النسبة المئوية للطلاب الناجحين)
-
-4. تحليل نصي موجز (3-4 جمل) يلخص أداء الطلاب ويقدم توصيات.
-
-أرجع النتائج بصيغة JSON منظمة بالشكل التالي:
-{
-  "subject": "اسم المادة",
-  "grade": "الصف",
-  "term": "الفصل",
-  "max_score": "الدرجة الكاملة",
-  "exam_date": "تاريخ الاختبار",
-  "analysis": "تحليل نصي",
-  "levels": [عدد_ممتاز, عدد_جيد_جدا, عدد_جيد, عدد_مقبول, عدد_ضعيف],
-  "stats": {
-    "count": عدد_الطلاب,
-    "average": المتوسط,
-    "max": أعلى_درجة,
-    "min": أدنى_درجة,
-    "success": نسبة_النجاح
-  }
-}
-
-البيانات:
-${text.substring(0, 3000)}`;
-        
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }]
-            })
+        studentsData.forEach((student, index) => {
+            excelData.push([
+                index + 1,
+                student.name,
+                student.score,
+                student.percentage + '%',
+                student.grade
+            ]);
         });
         
-        if (!response.ok) {
-            throw new Error(`خطأ في الاتصال: ${response.status}`);
-        }
+        // إضافة إحصائيات
+        excelData.push([]);
+        excelData.push(['الإحصائيات', '', '', '', '']);
+        excelData.push(['عدد الطلاب:', document.getElementById('totalStudents').textContent]);
+        excelData.push(['المتوسط:', document.getElementById('averageScore').textContent]);
+        excelData.push(['نسبة النجاح:', document.getElementById('successRate').textContent]);
+        excelData.push(['مستوى الأداء العام:', document.getElementById('overallLevel').textContent]);
         
-        const data = await response.json();
+        // إنشاء ورقة عمل
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
         
-        if (!data.candidates || !data.candidates[0].content.parts[0].text) {
-            throw new Error('استجابة غير صالحة من API');
-        }
+        // تنسيق الأعمدة
+        const wscols = [
+            {wch: 5},
+            {wch: 30},
+            {wch: 10},
+            {wch: 15},
+            {wch: 12}
+        ];
+        ws['!cols'] = wscols;
         
-        const responseText = data.candidates[0].content.parts[0].text;
-        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        // إنشاء مصنف
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'نتائج الطلاب');
         
-        if (!jsonMatch) {
-            throw new Error('لم يتم العثور على JSON في الاستجابة');
-        }
+        // حفظ الملف
+        const subject = document.getElementById('subjectName').value || 'الرياضيات';
+        const fileName = `نتائج_${subject}_${new Date().toISOString().slice(0,10)}.xlsx`;
+        XLSX.writeFile(wb, fileName);
         
-        const jsonData = JSON.parse(jsonMatch[0]);
-        renderData(jsonData);
-        showAlert('تم تحليل البيانات بنجاح!', 'success');
+        showAlert('تم تصدير البيانات إلى Excel بنجاح!', 'success');
         
     } catch (error) {
-        console.error('خطأ في تحليل البيانات:', error);
-        showAlert(`خطأ في التحليل: ${error.message}. يتم استخدام بيانات تجريبية.`, 'error');
-        useSampleData();
+        console.error('خطأ في تصدير Excel:', error);
+        showAlert('حدث خطأ أثناء تصدير Excel', 'error');
     } finally {
-        document.getElementById('loading').style.display = 'none';
+        showLoading(false);
     }
 }
 
-// استخدام بيانات تجريبية
-function useSampleData() {
-    const sampleData = {
-        subject: "الرياضيات",
-        grade: "الثاني الثانوي",
-        term: "الثاني",
-        max_score: "100",
-        exam_date: "15/06/1446 هـ",
-        analysis: "أظهرت نتائج الاختبار تحسناً ملحوظاً في مستوى الطلاب مقارنة بالاختبار السابق. لوحظ تركيز الضعف في الأسئلة المتعلقة بالتفاضل والتكامل، بينما أبدى الطلاب تفوقاً في الأسئلة الجبرية. نوصي بتكثيف التدريبات العملية في مواضيع التفاضل وحل المسائل التطبيقية لتحسين النتائج في الاختبارات القادمة.",
-        levels: [8, 12, 15, 8, 5],
-        stats: {
-            count: 48,
-            average: 76.5,
-            max: 98,
-            min: 45,
-            success: 85.4
-        }
-    };
-    
-    renderData(sampleData);
-}
-
-// عرض البيانات في التقرير
-function renderData(data) {
-    // تحديث المعلومات العامة
-    document.getElementById('subject').innerText = data.subject;
-    document.getElementById('grade').innerText = data.grade;
-    document.getElementById('term').innerText = data.term;
-    document.getElementById('maxScore').innerText = data.max_score;
-    document.getElementById('examDate').innerText = data.exam_date;
-    
-    // تحديث التحليل النصي
-    document.getElementById('analysisText').innerHTML = data.analysis.replace(/\n/g, '<br>');
-    document.getElementById('analysisStatus').innerHTML = '<i class="fas fa-check-circle"></i> مكتمل';
-    document.getElementById('analysisStatus').style.background = 'linear-gradient(135deg, #d4edda, #c3e6cb)';
-    document.getElementById('analysisStatus').style.color = '#155724';
-    
-    // تحديث الإحصائيات
-    document.getElementById('studentsCount').innerText = data.stats.count;
-    document.getElementById('averageScore').innerText = data.stats.average.toFixed(1);
-    document.getElementById('maxStudentScore').innerText = data.stats.max;
-    document.getElementById('minStudentScore').innerText = data.stats.min;
-    document.getElementById('successRate').innerText = data.stats.success.toFixed(1) + '%';
-    
-    // إنشاء المخططات المحسنة
-    initEnhancedCharts(data);
-}
-
-// تصدير ومشاركة التقرير مع تحسين جودة PDF
+// مشاركة عبر واتساب
 async function exportAndShare() {
+    showLoading(true);
+    
     try {
-        document.getElementById('loading').style.display = 'block';
-        showAlert('جاري إنشاء ملف PDF عالي الجودة...', 'warning');
-        
-        // إخفاء عناصر غير ضرورية أثناء التصدير
-        const reportElement = document.getElementById('report');
-        const watermark = reportElement.querySelector('.watermark');
-        if (watermark) watermark.style.display = 'none';
-        
-        // استخدام دقة عالية للتصدير
-        const canvas = await html2canvas(reportElement, {
-            scale: 4, // دقة عالية جداً
-            backgroundColor: '#ffffff',
+        const element = document.getElementById("report");
+        const canvas = await html2canvas(element, {
+            scale: 3,
+            backgroundColor: "#fff",
             useCORS: true,
-            logging: false,
-            allowTaint: true,
-            removeContainer: true,
-            windowWidth: reportElement.scrollWidth,
-            windowHeight: reportElement.scrollHeight
+            logging: false
         });
         
-        // إعادة عرض العلامة المائية
-        if (watermark) watermark.style.display = 'block';
-        
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
-        
-        // إنشاء PDF مع هوامش وإعدادات محسنة
+        const imgData = canvas.toDataURL("image/jpeg", 1.0);
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: 'a4',
-            compress: true
-        });
+        const pdf = new jsPDF("p", "mm", "a4");
         
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
+        pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
         
-        // إضافة صورة التقرير مع هوامش
-        const margin = 10;
-        const imgWidth = pageWidth - (margin * 2);
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        // إضافة معلومات إضافية
+        const subject = document.getElementById('subjectName').value || 'الرياضيات';
+        const fileName = `تقرير_نتائج_${subject}.pdf`;
         
-        // إضافة الصورة الرئيسية
-        pdf.addImage(imgData, 'JPEG', margin, margin, imgWidth, imgHeight);
-        
-        // إضافة معلومات إضافية في رأس الصفحة
-        pdf.setFontSize(10);
-        pdf.setTextColor(100, 100, 100);
-        pdf.text('تقرير تحليل النتائج - مدرسة النخبة النموذجية', pageWidth / 2, 8, { align: 'center' });
-        
-        // إضافة تذييل الصفحة
-        const currentDate = new Date().toLocaleDateString('ar-SA');
-        pdf.text(`تاريخ الإصدار: ${currentDate}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-        pdf.text(`الصفحة 1 من 1`, pageWidth - 10, pageHeight - 10, { align: 'right' });
-        
-        // حفظ PDF مع اسم ملف مناسب
-        const fileName = `تقرير_نتائج_${document.getElementById('subject').innerText || 'الاختبار'}_${new Date().toISOString().slice(0,10)}.pdf`;
-        const pdfBlob = pdf.output('blob');
-        const pdfFile = new File([pdfBlob], fileName, { 
-            type: 'application/pdf',
-            lastModified: new Date().getTime()
-        });
-        
-        // محاولة المشاركة عبر واتساب
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+        if (navigator.share && navigator.canShare) {
+            const pdfBlob = pdf.output('blob');
+            const pdfFile = new File([pdfBlob], fileName, { type: "application/pdf" });
+            
             try {
                 await navigator.share({
                     files: [pdfFile],
-                    title: 'تقرير تحليل النتائج',
-                    text: `تقرير تحليل نتائج ${document.getElementById('subject').innerText || 'الاختبار'} - ${document.getElementById('grade').innerText || ''}`
+                    title: `تقرير نتائج ${subject}`,
+                    text: `تقرير تحليل نتائج مادة ${subject}`
                 });
-                showAlert('تم مشاركة التقرير بنجاح عبر واتساب!', 'success');
+                showAlert('تم مشاركة التقرير عبر واتساب بنجاح!', 'success');
             } catch (shareError) {
-                console.log('مشاركة عبر واتساب فشلت، يتم الحفظ بدلاً من ذلك:', shareError);
+                // إذا فشلت المشاركة، حفظ الملف
                 pdf.save(fileName);
                 showAlert('تم حفظ التقرير كملف PDF!', 'success');
             }
@@ -1471,64 +1310,63 @@ async function exportAndShare() {
         }
         
     } catch (error) {
-        console.error('خطأ في التصدير:', error);
-        showAlert('حدث خطأ أثناء إنشاء التقرير. حاول مرة أخرى.', 'error');
+        console.error('خطأ في إنشاء PDF:', error);
+        showAlert('حدث خطأ أثناء إنشاء التقرير', 'error');
     } finally {
-        document.getElementById('loading').style.display = 'none';
+        showLoading(false);
     }
 }
 
-// طباعة التقرير
-function printReport() {
-    // إعداد خاص للطباعة
-    const originalStyles = document.querySelector('style').innerHTML;
-    const printStyles = `
-        @media print {
-            .actions-container, .alert, .loading { display: none !important; }
-            body { padding: 0; background: white; }
-            .page { box-shadow: none; margin: 0; padding: 15mm; width: 100%; }
-            .charts-container { page-break-inside: avoid; }
-            .chart-box { page-break-inside: avoid; }
-            .watermark { opacity: 0.1; }
-        }
-    `;
-    
-    document.querySelector('style').innerHTML = originalStyles + printStyles;
-    window.print();
-    
-    // استعادة الأنماط الأصلية بعد الطباعة
-    setTimeout(() => {
-        document.querySelector('style').innerHTML = originalStyles;
-    }, 1000);
+// مسح البيانات
+function clearForm() {
+    if (confirm('هل أنت متأكد من رغبتك في مسح جميع البيانات؟')) {
+        document.getElementById('subjectName').value = '';
+        document.getElementById('className').value = '';
+        document.getElementById('termName').value = '';
+        document.getElementById('totalScore').value = '';
+        document.getElementById('examDate').value = '';
+        document.getElementById('searchInput').value = '';
+        document.getElementById('studentSearch').value = '';
+        document.getElementById('gradeFilter').value = '';
+        
+        studentsData = [];
+        filteredStudents = [];
+        currentPage = 1;
+        
+        // إعادة تعيين التقرير إلى البيانات الافتراضية
+        document.getElementById('reportSubject').textContent = 'الرياضيات';
+        document.getElementById('reportClass').textContent = 'ثاني متوسط';
+        document.getElementById('reportTerm').textContent = 'الأول 1447هـ';
+        document.getElementById('reportTotalScore').textContent = '40';
+        document.getElementById('totalStudents').textContent = '20';
+        document.getElementById('averageScore').textContent = '30.7';
+        document.getElementById('successRate').textContent = '85%';
+        document.getElementById('belowMastery').textContent = '25%';
+        document.getElementById('overallLevel').textContent = 'جيد جدًا';
+        document.getElementById('analysisText').textContent = 'تعكس النتائج استقرارًا جيدًا في مستوى التحصيل مع وجود فئة محدودة تحتاج دعمًا إضافيًا.';
+        
+        document.getElementById('excellentCount').textContent = '7';
+        document.getElementById('verygoodCount').textContent = '5';
+        document.getElementById('goodCount').textContent = '3';
+        document.getElementById('passCount').textContent = '2';
+        document.getElementById('weakCount').textContent = '3';
+        
+        // إعادة إنشاء المخططات
+        createCharts();
+        
+        // مسح جدول الطلاب
+        document.getElementById('studentsTableBody').innerHTML = '';
+        document.getElementById('pageInfo').textContent = 'الصفحة 1 من 1';
+        document.getElementById('prevBtn').disabled = true;
+        document.getElementById('nextBtn').disabled = true;
+        
+        showAlert('تم مسح جميع البيانات بنجاح', 'success');
+    }
 }
 
-// حفظ التقرير كصورة
-async function saveAsImage() {
-    try {
-        document.getElementById('loading').style.display = 'block';
-        showAlert('جاري حفظ الصورة عالية الجودة...', 'warning');
-        
-        const canvas = await html2canvas(document.getElementById('report'), {
-            scale: 3,
-            backgroundColor: '#ffffff',
-            useCORS: true,
-            logging: false
-        });
-        
-        const link = document.createElement('a');
-        const fileName = `تقرير_نتائج_${document.getElementById('subject').innerText || 'الاختبار'}_${new Date().toISOString().slice(0,10)}.png`;
-        link.download = fileName;
-        link.href = canvas.toDataURL('image/png', 1.0);
-        link.click();
-        
-        showAlert('تم حفظ الصورة عالية الجودة بنجاح!', 'success');
-        
-    } catch (error) {
-        console.error('خطأ في حفظ الصورة:', error);
-        showAlert('حدث خطأ أثناء حفظ الصورة.', 'error');
-    } finally {
-        document.getElementById('loading').style.display = 'none';
-    }
+// إدارة التحميل
+function showLoading(show) {
+    document.getElementById('loading').style.display = show ? 'flex' : 'none';
 }
 
 // عرض رسائل التنبيه
@@ -1540,79 +1378,38 @@ function showAlert(message, type) {
     
     setTimeout(() => {
         alertDiv.style.display = 'none';
-    }, 5000);
-}
-
-// إعادة تعيين النموذج
-function resetForm() {
-    if (confirm('هل أنت متأكد من رغبتك في مسح جميع البيانات؟')) {
-        document.getElementById('apiKey').value = '';
-        document.getElementById('pdfFile').value = '';
-        
-        const resetData = {
-            subject: "-",
-            grade: "-",
-            term: "-",
-            max_score: "-",
-            exam_date: "-",
-            analysis: "سيظهر هنا التحليل الذكي للنتائج بعد رفع ملف PDF وإدخال مفتاح API. سيتضمن التقرير تحليلًا شاملاً للأداء ومقارنات مع النتائج السابقة وتوصيات للتحسين.",
-            levels: [0, 0, 0, 0, 0],
-            stats: {
-                count: "-",
-                average: "-",
-                max: "-",
-                min: "-",
-                success: 0
-            }
-        };
-        
-        renderData(resetData);
-        document.getElementById('analysisStatus').innerHTML = '<i class="fas fa-clock"></i> قيد الانتظار';
-        document.getElementById('analysisStatus').style.background = '#e0e0e0';
-        document.getElementById('analysisStatus').style.color = '#333';
-        
-        showAlert('تم مسح جميع البيانات بنجاح.', 'success');
-    }
+    }, 4000);
 }
 
 // تهيئة الصفحة
 window.onload = function() {
-    updateCurrentDate();
+    // إنشاء المخططات الافتراضية
+    createCharts();
     
-    // تهيئة مخططات فارغة
-    const initialData = {
-        subject: "-",
-        grade: "-",
-        term: "-",
-        max_score: "100",
-        exam_date: "-",
-        analysis: "",
-        levels: [0, 0, 0, 0, 0],
-        stats: {
-            count: 0,
-            average: 0,
-            max: 0,
-            min: 0,
-            success: 0
-        }
-    };
-    
-    initEnhancedCharts(initialData);
-    
-    // إضافة تأثيرات عند التمرير
-    window.addEventListener('scroll', function() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const reportElement = document.getElementById('report');
+    // تحسين الإدخال على الهواتف
+    if ('ontouchstart' in window) {
+        document.body.classList.add('touch-device');
         
-        if (scrollTop > 100) {
-            reportElement.style.transform = 'translateY(-10px)';
-            reportElement.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.2)';
-        } else {
-            reportElement.style.transform = 'translateY(0)';
-            reportElement.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.15)';
-        }
-    });
+        // زيادة حجم الأزرار على الهواتف
+        const buttons = document.querySelectorAll('button, .btn');
+        buttons.forEach(btn => {
+            btn.style.minHeight = '44px';
+        });
+    }
 };
+
+// دعم إدخال بيانات الطلاب بشكل يدوي
+document.getElementById('searchInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        const input = this.value.trim();
+        if (input) {
+            const lines = input.split('\n').filter(line => line.trim());
+            const tempText = lines.join('\n');
+            parseStudentData(tempText);
+            this.value = '';
+        }
+    }
+});
 </script>
 </body>
 </html>
